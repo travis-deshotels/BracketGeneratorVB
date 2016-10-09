@@ -4,12 +4,12 @@
 ' it under the terms of the GNU General Public License as published by
 ' the Free Software Foundation, either version 3 of the License, Or
 ' (at your option) any later version.
-' 
+'
 ' This program Is distributed in the hope that it will be useful,
 ' but WITHOUT ANY WARRANTY; without even the implied warranty of
 ' MERCHANTABILITY Or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ' GNU General Public License for more details.
-' 
+'
 ' You should have received a copy of the GNU General Public License
 ' along with this program.  If Not, see <http://www.gnu.org/licenses/>.
 
@@ -22,6 +22,11 @@ Public Class clsBracketManager
     Private a_intMatchCount As ArrayList
     Private intMatchCounter As Integer      'used to assign internal match numbers
 
+    'These are used for processing a bracket by level
+    Private intLvlBracketSize As Integer
+    Private intLvlCount As Integer
+    Private intLvlLevel As Integer
+
     Public Sub New()
         a_objBrackets = New ArrayList
         a_objBracketsDone = New ArrayList
@@ -32,9 +37,10 @@ Public Class clsBracketManager
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
-
-    '**Bracket Operations**
-    Public Sub AddBracket(ByVal strBracketName As String)
+    '
+    '  **Bracket Operations**
+    '
+    Public Sub AddBracket(ByVal strBracketName As String, ByVal e_Type As ce_BracketType)
         'Create Bracket
         Dim objBracket As New clsBracket
         objBracket.DivisionName = strBracketName
@@ -51,11 +57,14 @@ Public Class clsBracketManager
         objBracket = Nothing
     End Sub
 
-    Public Sub DeleteBracket(ByVal v_strDevisionName As String)
+    Public Sub DeleteBracket(ByVal v_strDivisionName As String)
 
     End Sub
 
     Public Function blnBracketsFinished() As Boolean
+        '
+        'Returns true when the all bracket have been processed
+        '
         Return a_objBrackets.Count = 0
     End Function
 
@@ -91,11 +100,10 @@ Public Class clsBracketManager
         Loop
 
         Call FirstBracket()
-
-        MsgBox("Brackets ready: " & a_objBrackets.Count.ToString & vbNewLine & _
-               "Brackets done: " & a_objBracketsDone.Count.ToString)
     End Sub
-
+    '
+    '  **Bracket iterator implementation**
+    '
     Public Sub NextBracket()
         intCurrentBracket += 1
     End Sub
@@ -111,8 +119,9 @@ Public Class clsBracketManager
     Public Function objGetCurrentBracket() As clsBracket
         Return CType(a_objBrackets(intCurrentBracket), clsBracket)
     End Function
-
-    '**Match Operations**
+    '
+    '  **Match Operations**
+    '
     Public Sub AddMatch(ByVal v_strPlayer1 As String, _
                         ByVal v_strPlayer2 As String)
         'Create Match
@@ -143,6 +152,48 @@ Public Class clsBracketManager
 
     Public Function objGetCurrentMatch() As clsMatch
         Return CType(objGetCurrentBracket.a_objMatches(CInt(a_intMatchCount(intCurrentBracket))), clsMatch)
+    End Function
+
+    '
+    '  **Other operations
+    '
+    Public Function intGetMatchNumberBye() As Integer
+        '
+        'Returns the match number for a 1st round bye player
+        '
+        Dim intIndex As Integer
+        Dim intMatchCount As Integer = objGetCurrentBracket.a_objMatches.Count
+        Dim intCurrentMatchIndex As Integer = CInt(a_intMatchCount(intCurrentBracket))
+        Dim intMatchNumber As Integer = intMatchCount + 1       'the return value
+
+        For intIndex = 0 To intMatchCount Step 2
+            If intIndex = intCurrentMatchIndex OrElse _
+            (intIndex + 1) = intCurrentMatchIndex Then
+                Return intMatchNumber
+            Else
+                intMatchNumber += 1
+            End If
+        Next intIndex
+    End Function
+
+    '
+    '  Used for processing brackets by level
+    '
+    Public Sub LevelStart()
+        intLvlBracketSize = objGetCurrentBracket.a_objMatches.Count + 1
+        intLvlCount = 0
+        intLvlLevel = CInt(intLvlBracketSize / 2)
+    End Sub
+
+    Public Function blnLevelIsDone() As Boolean
+        intLvlCount += 1
+        If intLvlCount = intLvlLevel Then
+            intLvlLevel = CInt(intLvlLevel / 2)
+            intLvlCount = 0
+            Return True
+        Else
+            Return False
+        End If
     End Function
 
 End Class
