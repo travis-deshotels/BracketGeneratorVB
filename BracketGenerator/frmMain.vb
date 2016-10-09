@@ -1,21 +1,30 @@
-﻿Imports System.IO
+Imports System.IO
 
 Public Class frmMain
     Private objBracketManager As clsBracketManager
 
-    Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub frmMain_Load(ByVal sender As System.Object, _
+                             ByVal e As System.EventArgs) _
+                             Handles MyBase.Load
         objBracketManager = New clsBracketManager
-        DumpMatches()
-        ' Call Test()
+        lstBracketType.Items.Add("Single Elimation")
+        lstBracketType.Items.Add("Double Elimation")
+        lstBracketType.SelectedIndex = ce_BracketType.SingleE
+        'DumpMatches()
+        'Call Test()
     End Sub
 
-    Private Sub btnAddBracket_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddBracket.Click
-        'Call Test()
-        Call CreateBracket()
+    Private Sub btnAddBracket_Click(ByVal sender As System.Object, _
+                                    ByVal e As System.EventArgs) _
+                                    Handles btnAddBracket.Click
+        If lstBracketType.SelectedIndex = ce_BracketType.SingleE Then
+            Call CreateBracket(ce_BracketType.SingleE)
+        Else
+            Call CreateBracket(ce_BracketType.DoubleEWinner)
+        End If
     End Sub
 
     Private Sub Test()
-        'Dim objMatch As New clsMatch
         txtDivisionName.Text = "Senior Men's 178"
         txtNames.Text = txtNames.Text & "Joey" & vbNewLine
         txtNames.Text = txtNames.Text & "Matt" & vbNewLine
@@ -25,7 +34,7 @@ Public Class frmMain
         txtNames.Text = txtNames.Text & "Davis" & vbNewLine
         txtNames.Text = txtNames.Text & "Sam" & vbNewLine
         txtNames.Text = txtNames.Text & "Nick"
-        Call CreateBracket()
+        Call CreateBracket(ce_BracketType.SingleE)
 
         txtDivisionName.Text = "Senior Women's 120"
         txtNames.Text = txtNames.Text & "Kerri" & vbNewLine
@@ -34,7 +43,7 @@ Public Class frmMain
         txtNames.Text = txtNames.Text & "Camille" & vbNewLine
         txtNames.Text = txtNames.Text & "Christina" & vbNewLine
         txtNames.Text = txtNames.Text & "Brittney"
-        Call CreateBracket()
+        Call CreateBracket(ce_BracketType.SingleE)
 
         txtDivisionName.Text = "Novice Men's 178"
         txtNames.Text = txtNames.Text & "Joe V" & vbNewLine
@@ -47,11 +56,9 @@ Public Class frmMain
         txtNames.Text = txtNames.Text & "Ryan" & vbNewLine
         txtNames.Text = txtNames.Text & "David" & vbNewLine
         txtNames.Text = txtNames.Text & "Sean"
-
-        'Call DumpMatches()
     End Sub
 
-    Private Sub CreateBracket()
+    Private Sub CreateBracket(ByVal ve_Type As ce_BracketType)
         '
         'Create a bracket from the list of names
         'and clear the list
@@ -85,9 +92,15 @@ Public Class frmMain
         intPlayerCount = objPlayersList.Count
         intMatchCount = intPlayerCount - 1
 
-        Call objBracketManager.AddBracket(txtDivisionName.Text)
+        If ve_Type = ce_BracketType.SingleE Then
+            Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.SingleE)
+        ElseIf ve_Type = ce_BracketType.DoubleEWinner Then
+            Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.DoubleEWinner)
+        End If
+
         For intPlayerIndex = 0 To intBracketSize - 1 Step 2
-            objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), CStr(objPlayersList(intPlayerIndex + 1)))
+            objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
+                                       CStr(objPlayersList(intPlayerIndex + 1)))
             intCurrentMatchNum += 1
         Next
         'Insert placeholders
@@ -97,6 +110,10 @@ Public Class frmMain
 
         lstBrackets.Items.Add(txtDivisionName.Text & ": " & CStr(intPlayersEntered))
 
+        If ve_Type = ce_BracketType.DoubleEWinner Then
+            Call CreateLosersBracket(intPlayersEntered - 1)
+        End If
+
         a_strNames = Nothing
         objPlayersList = Nothing
         txtNames.Text = String.Empty
@@ -104,7 +121,49 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub AddByeSpots(ByRef ra_strInputList() As String, ByRef r_objOutputList As ArrayList, ByVal v_intByeCount As Integer)
+    Private Sub CreateLosersBracket(ByVal v_intPlayerCount As Integer)
+        Dim a_strNames(v_intPlayerCount) As String
+        Dim objPlayersList As New ArrayList
+        Dim intPlayerCount As Integer
+        'Dim intPlayersEntered As Integer
+        Dim intMatchCount As Integer
+        Dim intPlayerIndex As Integer
+        Dim intMatchIndex As Integer
+        Dim intCurrentMatchNum As Integer = 0
+        Dim intBracketSize As Integer
+        Dim intCount As Integer
+
+        For intCount = 0 To v_intPlayerCount
+            a_strNames.SetValue(String.Empty, intCount)
+        Next
+
+        intBracketSize = intGetBracketSize(v_intPlayerCount)
+
+        Call AddByeSpots(a_strNames, _
+                         objPlayersList, _
+                         intBracketSize - v_intPlayerCount)
+
+        intPlayerCount = objPlayersList.Count
+        intMatchCount = intPlayerCount - 1
+
+        Call objBracketManager.AddBracket(txtDivisionName.Text & "Loser's Bracket", ce_BracketType.DoubleELoser)
+        For intPlayerIndex = 0 To intBracketSize - 1 Step 2
+            objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
+                                       CStr(objPlayersList(intPlayerIndex + 1)))
+            intCurrentMatchNum += 1
+        Next
+        'Insert placeholders
+        For intMatchIndex = intCurrentMatchNum To intMatchCount - 1 Step 1
+            objBracketManager.AddMatch(String.Empty, String.Empty)
+        Next
+
+        a_strNames = Nothing
+        objPlayersList = Nothing
+    End Sub
+
+    Private Sub AddByeSpots(ByRef ra_strInputList() As String, _
+                            ByRef r_objOutputList As ArrayList, _
+                            ByVal v_intByeCount As Integer)
         '
         'Returns a new list of players, including byes
         '
@@ -140,41 +199,50 @@ Public Class frmMain
         'Displays each bracket and its matches
         'Used for debugging
         '
+        Call objBracketManager.MarkBracketsReady()
+
         Dim objMatch As New clsMatch
-
-        'txtDebug.Text = String.Empty
-
-        Call objBracketManager.FirstBracket()
-        Do Until objBracketManager.blnLastBracket
-            '    'Print Bracket Name
-            '    txtDebug.Text = txtDebug.Text & objBracketManager.objGetCurrentBracket.DivisionName & ":" & vbNewLine
-            Call objBracketManager.FirstMatch()
-            Do Until objBracketManager.blnLastMatch
-                objMatch = objBracketManager.objGetCurrentMatch()
-                'Print Match
-                '        txtDebug.Text = txtDebug.Text & objMatch.bracketOrder & vbNewLine
-                '        txtDebug.Text = txtDebug.Text & vbTab & objMatch.player1 & vbNewLine
-                '        txtDebug.Text = txtDebug.Text & vbTab & objMatch.player2 & vbNewLine
-
-                Call objBracketManager.NextMatch()
-            Loop
-            Call objBracketManager.NextBracket()
-        Loop
-
         Dim FileWriter As StreamWriter
         FileWriter = New StreamWriter("C:\Users\me\Documents\test.txt")
 
-        FileWriter.Write("hello world")
-        FileWriter.WriteLine()
-        FileWriter.Close()
+        Call objBracketManager.FirstBracket()
+        Do Until objBracketManager.blnLastBracket
+            'Print Bracket Name
+            FileWriter.Write(objBracketManager.objGetCurrentBracket. _
+                             DivisionName & ":")
+            FileWriter.WriteLine()                                      'line break
+            FileWriter.WriteLine()
+            'Call objBracketManager.FirstMatch()
+            Call objBracketManager.LevelStart()                         'print by bracket level
+            While True
+                objMatch = objBracketManager.objGetCurrentMatch()
+                'Print Match
+                If Not objMatch.matchNumber = 0 Then
+                    FileWriter.Write(objMatch.matchNumber & " ")
+                End If
+                FileWriter.Write(objMatch.player1 & " - ")
+                FileWriter.Write(objMatch.player2)
+                FileWriter.WriteLine()
+                If objBracketManager.blnLevelIsDone Then
+                    FileWriter.WriteLine()
+                End If
 
+                If objBracketManager.blnLastMatch Then
+                    Exit While
+                Else
+                    Call objBracketManager.NextMatch()
+                End If
+            End While
+            FileWriter.WriteLine()
+            Call objBracketManager.NextBracket()
+        Loop
+
+        Call objBracketManager.MarkBracketsReady()
+        FileWriter.Close()
     End Sub
 
     Private Sub NumberMatches()
-        'Dim objMatch As New clsMatch
-        ' Dim intCount As Integer
         Dim intMatchNum As Integer = 0
-        'Dim blnFlag As Boolean = False
 
         Call objBracketManager.MarkBracketsReady()
 
@@ -184,10 +252,8 @@ Public Class frmMain
                 'Don't number matches that are byes
                 If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
                     intMatchNum += 1
-                    txtDebug.Text = txtDebug.Text & "Match " & intMatchNum & ": "
+                    objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
                 End If
-                txtDebug.Text = txtDebug.Text & objBracketManager.objGetCurrentMatch.player1 & " - "
-                txtDebug.Text = txtDebug.Text & objBracketManager.objGetCurrentMatch.player2 & vbNewLine
                 If objBracketManager.blnLastMatch Then
                     'Done numbering current bracket
                     Call objBracketManager.MarkBracketFinished()
@@ -199,12 +265,51 @@ Public Class frmMain
         End While
 
         Call objBracketManager.MarkBracketsReady()
-
     End Sub
 
-    Private Sub btnDump_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDump.Click
-        'Call objBracketManager.MarkBracketsReady()
-        'Call DumpMatches()
+    Private Sub AddNamesToLosersBrackets()
+        Dim int1stMatchNumber As Integer
+        Dim int2ndMatchNumber As Integer
+
+        Call objBracketManager.MarkBracketsReady()
+
+        While Not objBracketManager.blnBracketsFinished
+
+            Call objBracketManager.FirstBracket()
+
+            Do Until objBracketManager.blnLastBracket
+                'Skip any single elimination brackets
+                If objBracketManager.objGetCurrentBracket.BracketType = _
+                   ce_BracketType.SingleE Then
+                    Call objBracketManager.MarkBracketFinished()
+                Else
+                    'Find two non-bye matches to store the numbers
+                    int1stMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
+                    Call objBracketManager.NextMatch()
+                    int2ndMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
+                    Call objBracketManager.NextMatch()
+
+                    Call objBracketManager.NextBracket()
+
+                    'Find two names to change
+                    objBracketManager.objGetCurrentMatch.player1 = "L-" & _
+                                                                    CStr(int1stMatchNumber)
+                    objBracketManager.objGetCurrentMatch.player2 = "L-" & _
+                                                                    CStr(int2ndMatchNumber)
+                    Call objBracketManager.NextMatch()
+                End If
+                Call objBracketManager.NextBracket()
+            Loop
+
+        End While
+
+        Call objBracketManager.MarkBracketsReady()
+    End Sub
+
+    Private Sub btnDump_Click(ByVal sender As System.Object, _
+                              ByVal e As System.EventArgs) _
+                              Handles btnDump.Click
         Call NumberMatches()
+        Call DumpMatches()
     End Sub
 End Class

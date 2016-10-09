@@ -1,4 +1,4 @@
-﻿Public Class clsMatch
+Public Class clsMatch
     Private strPlayer1 As String
     Private strPlayer2 As String
     Private intBracketOrder As Integer

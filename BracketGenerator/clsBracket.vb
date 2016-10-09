@@ -1,6 +1,13 @@
-﻿Public Class clsBracket
+Public Enum ce_BracketType
+    SingleE = 0
+    DoubleEWinner = 1
+    DoubleELoser = 2
+End Enum
+
+Public Class clsBracket
     Private strDivisionName As String
     Private intPlayerCount As Integer
+    Private e_Type As ce_BracketType
     Public a_objMatches As ArrayList
 
     Public Sub New()
@@ -23,6 +30,15 @@
         End Get
         Set(ByVal value As Integer)
             intPlayerCount = value
+        End Set
+    End Property
+
+    Property BracketType() As ce_BracketType
+        Get
+            Return e_Type
+        End Get
+        Set(ByVal value As ce_BracketType)
+            e_Type = value
         End Set
     End Property
 
