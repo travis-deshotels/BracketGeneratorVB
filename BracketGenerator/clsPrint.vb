@@ -87,8 +87,6 @@
         objFW.Write("<td class=""cell_2"">&nbsp;</td>")
         objFW.Write("<td class=""cell_3"">&nbsp;</td>")
         objFW.Write("<td class=""cell_4"">&nbsp;</td>")
-        objFW.Write("<td class=""cell_5"">&nbsp;</td>")
-        objFW.Write("<td class=""cell_6"">&nbsp;</td>")
         objFW.Write("</tr>")
 
         'first match number
@@ -97,8 +95,6 @@
         objFW.Write(strMatchNumOrBye(intMatchNumber))
         objFW.Write("</td>")
         objFW.Write("<td class=""brack_under"">&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("</tr>")
@@ -119,8 +115,6 @@
         objFW.Write("</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("</tr>")
 
         'spacing
@@ -128,8 +122,6 @@
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td class=""brack_right"">&nbsp;</td>")
         objFW.Write("<td class=""brack_under"">&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("</tr>")
 
@@ -139,8 +131,6 @@
         objFW.Write(objTempMatch.player1)
         objFW.Write("</td>")
         objFW.Write("<td class=""brack_right"">&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("</tr>")
@@ -154,8 +144,6 @@
         objFW.Write("<td class=""brack_under_right_up"">&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("</tr>")
 
         'player 4
@@ -163,8 +151,6 @@
         objFW.Write("<td class=""brack_under_right_up"">")
         objFW.Write(objTempMatch.player2)
         objFW.Write("</td>")
-        objFW.Write("<td>&nbsp;</td>")
-        objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")
         objFW.Write("<td>&nbsp;</td>")

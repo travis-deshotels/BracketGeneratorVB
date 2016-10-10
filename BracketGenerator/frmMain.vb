@@ -60,6 +60,29 @@ Public Class frmMain
         txtNames.Text = txtNames.Text & "Sean"
     End Sub
 
+    Private Sub ClearNewLines(ByRef ra_strList() As String)
+        Dim a_strTemp As New ArrayList
+        Dim intCount As Integer
+
+        For intCount = 0 To ra_strList.Length - 1
+            If ra_strList(intCount) <> String.Empty _
+            AndAlso ra_strList(intCount) <> vbNewLine Then
+                a_strTemp.Add(ra_strList(intCount))
+            End If
+        Next
+
+        ra_strList = Nothing
+        ReDim ra_strList(a_strTemp.Count - 1)
+
+        intCount = 0
+
+        For Each objItem As Object In a_strTemp
+            ra_strList(intCount) = CStr(objItem)
+            intCount += 1
+        Next
+
+    End Sub
+
     Private Sub CreateBracket(ByVal ve_Type As ce_BracketType)
         '
         'Create a bracket from the list of names
@@ -76,6 +99,8 @@ Public Class frmMain
         Dim intBracketSize As Integer
 
         a_strNames = Split(txtNames.Text, vbNewLine)
+
+        Call ClearNewLines(a_strNames)
 
         'Cancel if less than two names are entered
         If a_strNames.Length < 2 Then
@@ -380,6 +405,46 @@ Public Class frmMain
         Call objBracketManager.MarkBracketsReady()
     End Sub
 
+    Private Sub NumberMatches2()
+        Dim intMatchNum As Integer = 0
+        Dim blnFirstRoundDone = False
+
+        Call objBracketManager.MarkBracketsReady()
+
+        While Not objBracketManager.blnBracketsFinished
+            Call objBracketManager.FirstBracket()
+            Do Until objBracketManager.blnLastBracket
+                If objBracketManager.objGetCurrentBracket.BracketType <> _
+                ce_BracketType.DoubleELoser OrElse blnFirstRoundDone Then
+                    If Not blnFirstRoundDone Then
+                        Call objBracketManager.LevelStart()
+                    End If
+
+                    While True
+                        'Don't number matches that are byes
+                        If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                            intMatchNum += 1
+                            objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                        End If
+                        Call objBracketManager.NextMatch()
+                        If objBracketManager.blnLastMatch Then
+                            'Done numbering current bracket
+                            Call objBracketManager.MarkBracketFinished()
+                            Exit While
+                        ElseIf objBracketManager.blnLevelIsDone Then
+                            Exit While
+                        End If
+
+                    End While
+                End If
+                Call objBracketManager.NextBracket()
+            Loop
+            blnFirstRoundDone = True
+        End While
+
+        Call objBracketManager.MarkBracketsReady()
+    End Sub
+
     Private Sub AddNamesToLosersBrackets()
         Dim intMatchNumber As Integer
         Dim blnDone As Boolean = False
@@ -456,8 +521,8 @@ Public Class frmMain
                               Handles btnDump.Click
         Call NumberMatches()
         Call AddNamesToLosersBrackets()
-        'Call DumpMatches()
-        objPrint = New clsPrint(objBracketManager)
-        Call objPrint.PrintAllBrackets()
+        Call DumpMatches()
+        'objPrint = New clsPrint(objBracketManager)
+        'Call objPrint.PrintAllBrackets()
     End Sub
 End Class
