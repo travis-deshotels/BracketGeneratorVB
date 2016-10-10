@@ -1,21 +1,4 @@
-﻿' Copyright (C) 2016 Travis Deshotels
-'
-' This program Is free software: you can redistribute it And/Or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, Or
-' (at your option) any later version.
-'
-' This program Is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY Or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-'
-' You should have received a copy of the GNU General Public License
-' along with this program.  If Not, see <http://www.gnu.org/licenses/>.
-
-'travis.deshotels@gmail.com
-
-Imports System.IO
+﻿Imports System.IO
 Public Class frmMain
     Private objBracketManager As clsBracketManager
 
@@ -23,10 +6,11 @@ Public Class frmMain
                              ByVal e As System.EventArgs) _
                              Handles MyBase.Load
         objBracketManager = New clsBracketManager
+        'objBracketManager.TestSort()
         lstBracketType.Items.Add("Single Elimation")
-        lstBracketType.Items.Add("Double Elimation")
+        lstBracketType.Items.Add("Modified Double")
         lstBracketType.SelectedIndex = ce_BracketType.SingleE
-        'DumpMatches()
+
         'Call Test()
     End Sub
 
@@ -138,7 +122,7 @@ Public Class frmMain
     End Sub
 
     Private Sub CreateLosersBracket(ByVal v_intPlayerCount As Integer)
-        Dim a_strNames(v_intPlayerCount) As String
+        Dim a_strNames(v_intPlayerCount - 1) As String
         Dim objPlayersList As New ArrayList
         Dim intPlayerCount As Integer
         'Dim intPlayersEntered As Integer
@@ -149,7 +133,7 @@ Public Class frmMain
         Dim intBracketSize As Integer
         Dim intCount As Integer
 
-        For intCount = 0 To v_intPlayerCount
+        For intCount = 0 To v_intPlayerCount - 1
             a_strNames.SetValue(String.Empty, intCount)
         Next
 
@@ -162,7 +146,7 @@ Public Class frmMain
         intPlayerCount = objPlayersList.Count
         intMatchCount = intPlayerCount - 1
 
-        Call objBracketManager.AddBracket(txtDivisionName.Text & "Loser's Bracket", ce_BracketType.DoubleELoser)
+        Call objBracketManager.AddBracket(txtDivisionName.Text & " Loser's Bracket", ce_BracketType.DoubleELoser)
         For intPlayerIndex = 0 To intBracketSize - 1 Step 2
             objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
                                        CStr(objPlayersList(intPlayerIndex + 1)))
@@ -219,7 +203,8 @@ Public Class frmMain
 
         Dim objMatch As New clsMatch
         Dim FileWriter As StreamWriter
-        FileWriter = New StreamWriter("C:\Users\me\Documents\test.txt")
+
+        FileWriter = New StreamWriter(System.Environment.CurrentDirectory & "\test.txt")
 
         Call objBracketManager.FirstBracket()
         Do Until objBracketManager.blnLastBracket
@@ -234,7 +219,9 @@ Public Class frmMain
                 objMatch = objBracketManager.objGetCurrentMatch()
                 'Print Match
                 If Not objMatch.matchNumber = 0 Then
-                    FileWriter.Write(objMatch.matchNumber & " ")
+                    FileWriter.Write(objMatch.matchNumber & vbTab)
+                Else
+                    FileWriter.Write("*" & vbTab)
                 End If
                 FileWriter.Write(objMatch.player1 & " - ")
                 FileWriter.Write(objMatch.player2)
@@ -243,10 +230,9 @@ Public Class frmMain
                     FileWriter.WriteLine()
                 End If
 
+                Call objBracketManager.NextMatch()
                 If objBracketManager.blnLastMatch Then
                     Exit While
-                Else
-                    Call objBracketManager.NextMatch()
                 End If
             End While
             FileWriter.WriteLine()
@@ -270,11 +256,10 @@ Public Class frmMain
                     intMatchNum += 1
                     objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
                 End If
+                Call objBracketManager.NextMatch()
                 If objBracketManager.blnLastMatch Then
                     'Done numbering current bracket
                     Call objBracketManager.MarkBracketFinished()
-                Else
-                    Call objBracketManager.NextMatch()
                 End If
                 Call objBracketManager.NextBracket()
             Loop
@@ -284,48 +269,81 @@ Public Class frmMain
     End Sub
 
     Private Sub AddNamesToLosersBrackets()
-        Dim int1stMatchNumber As Integer
-        Dim int2ndMatchNumber As Integer
+        Dim intMatchNumber As Integer
+        Dim blnDone As Boolean = False
 
         Call objBracketManager.MarkBracketsReady()
 
-        While Not objBracketManager.blnBracketsFinished
+        'Skip any single elimination brackets
+        Call objBracketManager.FirstBracket()
+        Do Until objBracketManager.blnLastBracket
+            If objBracketManager.objGetCurrentBracket.BracketType = _
+               ce_BracketType.SingleE Then
+                Call objBracketManager.MarkBracketFinished()
+            End If
+            Call objBracketManager.NextBracket()
+        Loop
 
+        While Not objBracketManager.blnBracketsFinished
             Call objBracketManager.FirstBracket()
 
             Do Until objBracketManager.blnLastBracket
-                'Skip any single elimination brackets
-                If objBracketManager.objGetCurrentBracket.BracketType = _
-                   ce_BracketType.SingleE Then
-                    Call objBracketManager.MarkBracketFinished()
-                Else
-                    'Find two non-bye matches to store the numbers
-                    int1stMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
+                'This starts at a winner's bracket
+                If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                    'non-bye match, so store the number
+                    intMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
                     Call objBracketManager.NextMatch()
-                    int2ndMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
-                    Call objBracketManager.NextMatch()
+                    If objBracketManager.blnLastMatch Then
+                        Call objBracketManager.MarkBracketFinished()
+                        blnDone = True
+                    End If
 
                     Call objBracketManager.NextBracket()
 
-                    'Find two names to change
-                    objBracketManager.objGetCurrentMatch.player1 = "L-" & _
-                                                                    CStr(int1stMatchNumber)
-                    objBracketManager.objGetCurrentMatch.player2 = "L-" & _
-                                                                    CStr(int2ndMatchNumber)
+                    'Now at loser's bracket
+                    If objBracketManager.objGetCurrentMatch.player2 = "bye" Then
+                        objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
+                        If blnDone Then
+                            Call objBracketManager.MarkBracketFinished()
+                            blnDone = False
+                        Else
+                            Call objBracketManager.NextMatch()
+                        End If
+                    ElseIf objBracketManager.objGetCurrentMatch.player1 = String.Empty Then
+                        objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
+                    Else
+                        'It's a non-bye and player 1 is named, so name player 2
+                        objBracketManager.objGetCurrentMatch.player2 = "L-" & CStr(intMatchNumber)
+                        If blnDone Then
+                            Call objBracketManager.MarkBracketFinished()
+                            blnDone = False
+                        Else
+                            Call objBracketManager.NextMatch()
+                        End If
+                    End If
+
+                    'Go to next winner's bracket
+                    Call objBracketManager.NextBracket()
+
+                Else
+                    'Skip to the next winner's bracket
                     Call objBracketManager.NextMatch()
+                    Call objBracketManager.NextBracket()
+                    Call objBracketManager.NextBracket()
                 End If
-                Call objBracketManager.NextBracket()
             Loop
 
         End While
 
         Call objBracketManager.MarkBracketsReady()
+
     End Sub
 
     Private Sub btnDump_Click(ByVal sender As System.Object, _
                               ByVal e As System.EventArgs) _
                               Handles btnDump.Click
         Call NumberMatches()
+        Call AddNamesToLosersBrackets()
         Call DumpMatches()
     End Sub
 End Class

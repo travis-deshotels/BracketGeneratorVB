@@ -1,21 +1,4 @@
-﻿' Copyright (C) 2016 Travis Deshotels
-'
-' This program Is free software: you can redistribute it And/Or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, Or
-' (at your option) any later version.
-'
-' This program Is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY Or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-'
-' You should have received a copy of the GNU General Public License
-' along with this program.  If Not, see <http://www.gnu.org/licenses/>.
-
-'travis.deshotels@gmail.com
-
-Public Class clsBracketManager
+﻿Public Class clsBracketManager
     Private a_objBrackets As ArrayList
     Private a_objBracketsDone As ArrayList
     Private intCurrentBracket As Integer
@@ -44,8 +27,9 @@ Public Class clsBracketManager
         'Create Bracket
         Dim objBracket As New clsBracket
         objBracket.DivisionName = strBracketName
-        objBracket.PlayerCount = 0
         objBracket.a_objMatches = New ArrayList
+        objBracket.BracketType = e_Type
+        objBracket.BracketOrder = a_objBrackets.Count
 
         'Add Bracket to list
         a_objBrackets.Add(objBracket)
@@ -71,14 +55,14 @@ Public Class clsBracketManager
     Public Sub MarkBracketFinished()
         '
         'Marks the current bracket as finished
+        'Adjusts current match pointer
         'Moves currentbracket backward
         '
-        Call a_objBracketsDone.Insert(intCurrentBracket, objGetCurrentBracket)
-        'If blnLastBracket() Then
+        Call a_objBracketsDone.Add(objGetCurrentBracket)
         Call a_objBrackets.RemoveAt(intCurrentBracket)
+        Call a_intMatchCount.RemoveAt(intCurrentBracket)
         intCurrentBracket -= 1
-        'End If
-        'Call a_objBrackets.RemoveAt(intCurrentBracket)
+
     End Sub
 
     Public Sub MarkBracketsReady()
@@ -86,11 +70,16 @@ Public Class clsBracketManager
         'Marks all brackets as unprocessed
         'Initializes all match pointers
         '
-        For Count As Integer = 0 To a_objBracketsDone.Count - 1
-            Call a_objBrackets.Add(a_objBracketsDone(Count))
-        Next
+        If a_objBracketsDone.Count > 0 Then
+            Call SortFinishedBrackets()
 
-        Call a_objBracketsDone.Clear()
+            For Count As Integer = 0 To a_objBracketsDone.Count - 1
+                Call a_objBrackets.Add(a_objBracketsDone(Count))
+                Call a_intMatchCount.Add(-1)
+            Next
+
+            Call a_objBracketsDone.Clear()
+        End If
 
         'set each bracket to first match
         Call FirstBracket()
@@ -147,7 +136,7 @@ Public Class clsBracketManager
     End Sub
 
     Public Function blnLastMatch() As Boolean
-        Return CInt(a_intMatchCount(intCurrentBracket)) = objGetCurrentBracket.a_objMatches.Count - 1
+        Return CInt(a_intMatchCount(intCurrentBracket)) = objGetCurrentBracket.a_objMatches.Count
     End Function
 
     Public Function objGetCurrentMatch() As clsMatch
@@ -175,6 +164,72 @@ Public Class clsBracketManager
             End If
         Next intIndex
     End Function
+
+    Public Sub SortFinishedBrackets()
+        Dim intX As Integer
+        Dim intY As Integer
+        Dim intMin As Integer
+        Dim intMinIndex As Integer
+        Dim objTemp As clsBracket
+
+        For intY = 0 To a_objBracketsDone.Count - 1
+            intMinIndex = intY
+            intMin = CType(a_objBracketsDone.Item(intY), clsBracket).BracketOrder
+            For intX = intY + 1 To a_objBracketsDone.Count - 1
+                If CType(a_objBracketsDone.Item(intX), clsBracket).BracketOrder < intMin Then
+                    intMinIndex = intX
+                    intMin = CType(a_objBracketsDone.Item(intX), clsBracket).BracketOrder
+                End If
+            Next
+            objTemp = CType(a_objBracketsDone.Item(intY), clsBracket)
+            a_objBracketsDone.Item(intY) = CType(a_objBracketsDone.Item(intMinIndex), clsBracket)
+            a_objBracketsDone.Item(intMinIndex) = objTemp
+            objTemp = Nothing
+        Next
+
+    End Sub
+
+    Public Sub TestSort()
+        Dim b As clsBracket
+
+        b = New clsBracket
+        b.BracketOrder = 8
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 5
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 1
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 0
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 2
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 3
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 6
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 7
+        a_objBracketsDone.Add(b)
+
+        b = New clsBracket
+        b.BracketOrder = 4
+        a_objBracketsDone.Add(b)
+
+        Call SortFinishedBrackets()
+    End Sub
 
     '
     '  Used for processing brackets by level
