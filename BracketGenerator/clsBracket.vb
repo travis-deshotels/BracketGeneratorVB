@@ -6,13 +6,14 @@ End Enum
 
 Public Class clsBracket
     Private strDivisionName As String
-    Private intPlayerCount As Integer
     Private e_Type As ce_BracketType
-    Public a_objMatches As ArrayList
+    Friend a_objMatches As ArrayList
+    Private intBracketOrder As Integer
+    'Private intPlayerCount As Integer
 
     Public Sub New()
         a_objMatches = New ArrayList
-        intPlayerCount = 0
+        'intPlayerCount = 0
     End Sub
 
     Property DivisionName() As String
@@ -24,15 +25,6 @@ Public Class clsBracket
         End Set
     End Property
 
-    Property PlayerCount() As Integer
-        Get
-            Return intPlayerCount
-        End Get
-        Set(ByVal value As Integer)
-            intPlayerCount = value
-        End Set
-    End Property
-
     Property BracketType() As ce_BracketType
         Get
             Return e_Type
@@ -41,5 +33,23 @@ Public Class clsBracket
             e_Type = value
         End Set
     End Property
+
+    Property BracketOrder() As Integer
+        Get
+            Return intBracketOrder
+        End Get
+        Set(ByVal value As Integer)
+            intBracketOrder = value
+        End Set
+    End Property
+
+    'Property PlayerCount() As Integer
+    '    Get
+    '        Return intPlayerCount
+    '    End Get
+    '    Set(ByVal value As Integer)
+    '        intPlayerCount = value
+    '    End Set
+    'End Property
 
 End Class

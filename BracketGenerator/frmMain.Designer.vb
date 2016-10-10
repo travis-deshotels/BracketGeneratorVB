@@ -24,7 +24,6 @@ Partial Class frmMain
     Private Sub InitializeComponent()
         Me.txtNames = New System.Windows.Forms.TextBox
         Me.btnAddBracket = New System.Windows.Forms.Button
-        Me.txtDebug = New System.Windows.Forms.TextBox
         Me.txtDivisionName = New System.Windows.Forms.TextBox
         Me.lblDivision = New System.Windows.Forms.Label
         Me.lblPlayers = New System.Windows.Forms.Label
@@ -40,33 +39,23 @@ Partial Class frmMain
         Me.txtNames.Multiline = True
         Me.txtNames.Name = "txtNames"
         Me.txtNames.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtNames.Size = New System.Drawing.Size(442, 149)
+        Me.txtNames.Size = New System.Drawing.Size(385, 149)
         Me.txtNames.TabIndex = 2
         '
         'btnAddBracket
         '
-        Me.btnAddBracket.Location = New System.Drawing.Point(394, 280)
+        Me.btnAddBracket.Location = New System.Drawing.Point(336, 289)
         Me.btnAddBracket.Name = "btnAddBracket"
         Me.btnAddBracket.Size = New System.Drawing.Size(82, 23)
         Me.btnAddBracket.TabIndex = 4
         Me.btnAddBracket.Text = "Process"
         Me.btnAddBracket.UseVisualStyleBackColor = True
         '
-        'txtDebug
-        '
-        Me.txtDebug.Location = New System.Drawing.Point(33, 604)
-        Me.txtDebug.Multiline = True
-        Me.txtDebug.Name = "txtDebug"
-        Me.txtDebug.ReadOnly = True
-        Me.txtDebug.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtDebug.Size = New System.Drawing.Size(442, 34)
-        Me.txtDebug.TabIndex = 98
-        '
         'txtDivisionName
         '
         Me.txtDivisionName.Location = New System.Drawing.Point(33, 24)
         Me.txtDivisionName.Name = "txtDivisionName"
-        Me.txtDivisionName.Size = New System.Drawing.Size(442, 20)
+        Me.txtDivisionName.Size = New System.Drawing.Size(385, 20)
         Me.txtDivisionName.TabIndex = 1
         '
         'lblDivision
@@ -92,16 +81,16 @@ Partial Class frmMain
         Me.lstBrackets.FormattingEnabled = True
         Me.lstBrackets.Location = New System.Drawing.Point(34, 399)
         Me.lstBrackets.Name = "lstBrackets"
-        Me.lstBrackets.Size = New System.Drawing.Size(442, 199)
+        Me.lstBrackets.Size = New System.Drawing.Size(384, 173)
         Me.lstBrackets.TabIndex = 99
         '
         'btnDump
         '
-        Me.btnDump.Location = New System.Drawing.Point(313, 280)
+        Me.btnDump.Location = New System.Drawing.Point(256, 289)
         Me.btnDump.Name = "btnDump"
         Me.btnDump.Size = New System.Drawing.Size(75, 23)
         Me.btnDump.TabIndex = 5
-        Me.btnDump.Text = "Dump"
+        Me.btnDump.Text = "Output"
         Me.btnDump.UseVisualStyleBackColor = True
         '
         'lstBracketType
@@ -125,7 +114,7 @@ Partial Class frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(518, 650)
+        Me.ClientSize = New System.Drawing.Size(439, 597)
         Me.Controls.Add(Me.lblType)
         Me.Controls.Add(Me.lstBracketType)
         Me.Controls.Add(Me.btnDump)
@@ -133,7 +122,6 @@ Partial Class frmMain
         Me.Controls.Add(Me.lblPlayers)
         Me.Controls.Add(Me.lblDivision)
         Me.Controls.Add(Me.txtDivisionName)
-        Me.Controls.Add(Me.txtDebug)
         Me.Controls.Add(Me.btnAddBracket)
         Me.Controls.Add(Me.txtNames)
         Me.Name = "frmMain"
@@ -144,7 +132,6 @@ Partial Class frmMain
     End Sub
     Friend WithEvents txtNames As System.Windows.Forms.TextBox
     Friend WithEvents btnAddBracket As System.Windows.Forms.Button
-    Friend WithEvents txtDebug As System.Windows.Forms.TextBox
     Friend WithEvents txtDivisionName As System.Windows.Forms.TextBox
     Friend WithEvents lblDivision As System.Windows.Forms.Label
     Friend WithEvents lblPlayers As System.Windows.Forms.Label
