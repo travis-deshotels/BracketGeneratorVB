@@ -41,6 +41,16 @@ Public Class clsBracketManager
         objBracket = Nothing
     End Sub
 
+    'Public Sub AddBracket(ByVal v_objBracket As clsBracket)
+
+    '    'Add Bracket to list
+    '    a_objBrackets.Add(v_objBracket)
+    '    intCurrentBracket += 1
+
+    '    'Add a match counter for each bracket
+    '    Call a_intMatchCount.Add(-1)
+    'End Sub
+
     Public Sub DeleteBracket(ByVal v_strDivisionName As String)
 
     End Sub
@@ -146,26 +156,29 @@ Public Class clsBracketManager
     '
     '  **Other operations
     '
-    Public Function intGetMatchNumberBye() As Integer
+    Public Sub intGetMatchNumberBye(ByRef r_intMatchNumber As Integer, ByRef r_Color As ce_MatchColor)
         '
         'Returns the match number for a 1st round bye player
         '
         Dim intIndex As Integer
         Dim intMatchCount As Integer = objGetCurrentBracket.a_objMatches.Count
         Dim intCurrentMatchIndex As Integer = CInt(a_intMatchCount(intCurrentBracket))
-        Dim intMatchNumber As Integer = intMatchCount + 1       'the return value
+        Dim intMatchNumber As Integer = CInt(intMatchCount / 2)         'the return value
 
         For intIndex = 0 To intMatchCount Step 2
-            If intIndex = intCurrentMatchIndex OrElse _
-            (intIndex + 1) = intCurrentMatchIndex Then
-                Return intMatchNumber
+            If intIndex = intCurrentMatchIndex Then
+                r_intMatchNumber = CType(objGetCurrentBracket.a_objMatches(intMatchNumber), clsMatch).matchNumber
+                r_Color = ce_MatchColor.e_Blue
+            ElseIf (intIndex + 1) = intCurrentMatchIndex Then
+                r_intMatchNumber = CType(objGetCurrentBracket.a_objMatches(intMatchNumber), clsMatch).matchNumber
+                r_Color = ce_MatchColor.e_White
             Else
                 intMatchNumber += 1
             End If
         Next intIndex
-    End Function
+    End Sub
 
-    Public Sub SortFinishedBrackets()
+    Private Sub SortFinishedBrackets()
         Dim intX As Integer
         Dim intY As Integer
         Dim intMin As Integer
@@ -188,6 +201,20 @@ Public Class clsBracketManager
         Next
 
     End Sub
+
+    Public Function intGetTotalMatchCount() As Integer
+        Dim intTotal As Integer = 0
+
+        For Each objBracket As clsBracket In a_objBrackets
+            intTotal += objBracket.a_objMatches.Count
+        Next
+
+        Return intTotal
+    End Function
+
+    Public Function intGetCurrentBracketSize() As Integer
+        Return objGetCurrentBracket.a_objMatches.Count + 1
+    End Function
 
     Public Sub TestSort()
         Dim b As clsBracket

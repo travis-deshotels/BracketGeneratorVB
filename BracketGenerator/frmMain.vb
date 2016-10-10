@@ -2,6 +2,7 @@ Imports System.IO
 
 Public Class frmMain
     Private objBracketManager As clsBracketManager
+    Private objPrint As clsPrint
 
     Private Sub frmMain_Load(ByVal sender As System.Object, _
                              ByVal e As System.EventArgs) _
@@ -10,7 +11,7 @@ Public Class frmMain
         'objBracketManager.TestSort()
         lstBracketType.Items.Add("Single Elimation")
         lstBracketType.Items.Add("Modified Double")
-        lstBracketType.SelectedIndex = ce_BracketType.SingleE
+        lstBracketType.SelectedIndex = ce_BracketType.DoubleEWinner
 
         'Call Test()
     End Sub
@@ -169,14 +170,76 @@ Public Class frmMain
         'Returns a new list of players, including byes
         '
         Dim intCount As Integer
+        Dim intByeCount As Integer = v_intByeCount
+        Dim intMidPoint As Integer = CInt(ra_strInputList.Length / 2)
 
-        For intCount = 0 To ra_strInputList.Count - 1
-            r_objOutputList.Add(ra_strInputList(intCount))
-            If v_intByeCount > 0 Then
-                r_objOutputList.Add("bye")
-                v_intByeCount -= 1
-            End If
-        Next
+        If (intMidPoint Mod 2) = 0 Then
+            intMidPoint += 1
+        End If
+
+        Select Case v_intByeCount
+            Case 1
+                'Make the first match a bye
+                Call r_objOutputList.Add(ra_strInputList(0))
+                Call r_objOutputList.Add("bye")
+
+                'Add the rest of the match to the output list
+                For intCount = 1 To ra_strInputList.Count - 1
+                    Call r_objOutputList.Add(ra_strInputList(intCount))
+                Next
+            Case 2
+                'Make the first and last match a bye
+                Call r_objOutputList.Add(ra_strInputList(0))
+                Call r_objOutputList.Add("bye")
+
+                For intCount = 1 To ra_strInputList.Count - 2
+                    Call r_objOutputList.Add(ra_strInputList(intCount))
+                Next
+
+                Call r_objOutputList.Add(ra_strInputList(ra_strInputList.Length - 1))
+                Call r_objOutputList.Add("bye")
+            Case 3
+                'Make the first, middle, and last match a bye
+                Call r_objOutputList.Add(ra_strInputList(0))
+                Call r_objOutputList.Add("bye")
+
+                For intCount = 1 To intMidPoint - 1
+                    Call r_objOutputList.Add(ra_strInputList(intCount))
+                Next
+
+                Call r_objOutputList.Add(ra_strInputList(intMidPoint))
+                Call r_objOutputList.Add("bye")
+
+                For intCount = intMidPoint + 1 To ra_strInputList.Count - 2
+                    Call r_objOutputList.Add(ra_strInputList(intCount))
+                Next
+
+                Call r_objOutputList.Add(ra_strInputList(ra_strInputList.Length - 1))
+                Call r_objOutputList.Add("bye")
+            Case Else
+                'Make every other match a bye, as long as that's possible
+                For intCount = 0 To ra_strInputList.Count - 1
+                    If ra_strInputList.Length - intCount = intByeCount Then
+                        Call r_objOutputList.Add(ra_strInputList(intCount))
+                        Call r_objOutputList.Add("bye")
+                        intByeCount -= 1
+                    Else
+                        Call r_objOutputList.Add(ra_strInputList(intCount))
+                        If intCount Mod 3 = 0 AndAlso intByeCount > 0 Then
+                            Call r_objOutputList.Add("bye")
+                            intByeCount -= 1
+                        End If
+                    End If
+                Next
+
+                'For intCount = 0 To ra_strInputList.Count - 1
+                '    Call r_objOutputList.Add(ra_strInputList(intCount))
+                '    If intByeCount > 0 Then
+                '        Call r_objOutputList.Add("bye")
+                '        intByeCount -= 1
+                '    End If
+                'Next
+        End Select
     End Sub
 
     Private Function intGetBracketSize(ByVal intPlayerCount As Integer) As Integer
@@ -203,10 +266,14 @@ Public Class frmMain
         Call objBracketManager.MarkBracketsReady()
 
         Dim objMatch As New clsMatch
-        Dim FileWriter As StreamWriter
+        Dim FileWriter As IO.StreamWriter
+        Dim intMatchNumberBye As Integer = 0
+        Dim e_Color As ce_MatchColor = ce_MatchColor.e_Blue
 
-        FileWriter = New StreamWriter(System.Environment.CurrentDirectory & "\test.txt")
-
+        FileWriter = New IO.StreamWriter(System.Environment.CurrentDirectory & "\test.txt")
+        FileWriter.Write("Brackets")
+        FileWriter.WriteLine()
+        FileWriter.WriteLine()
         Call objBracketManager.FirstBracket()
         Do Until objBracketManager.blnLastBracket
             'Print Bracket Name
@@ -239,28 +306,72 @@ Public Class frmMain
             FileWriter.WriteLine()
             Call objBracketManager.NextBracket()
         Loop
-
+        FileWriter.WriteLine()
+        FileWriter.WriteLine()
+        FileWriter.Write("Match Cards")
+        FileWriter.WriteLine()
+        FileWriter.WriteLine()
         Call objBracketManager.MarkBracketsReady()
+
+        'Print Match Cards
+        Call objBracketManager.FirstBracket()
+        Do Until objBracketManager.blnLastBracket
+            If Not objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.DoubleELoser Then
+                Call objBracketManager.LevelStart()
+                While True
+                    FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
+                    If objBracketManager.objGetCurrentMatch.player2 = "bye" Then
+                        Call objBracketManager.intGetMatchNumberBye(intMatchNumberBye, e_Color)
+                        If e_Color = ce_MatchColor.e_Blue Then
+                            FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "Blue")
+                        Else
+                            FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "White")
+                        End If
+                    Else
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
+                    End If
+                    FileWriter.WriteLine()
+
+                    If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "White")
+                        FileWriter.WriteLine()
+                    End If
+
+                    If objBracketManager.blnLevelIsDone Then
+                        Exit While
+                    End If
+                    Call objBracketManager.NextMatch()
+                End While
+            End If
+            Call objBracketManager.NextBracket()
+        Loop
+
         FileWriter.Close()
     End Sub
 
     Private Sub NumberMatches()
         Dim intMatchNum As Integer = 0
+        Dim intOneQuarter As Integer = CInt(objBracketManager.intGetTotalMatchCount / 4)
 
         Call objBracketManager.MarkBracketsReady()
 
         While Not objBracketManager.blnBracketsFinished
             Call objBracketManager.FirstBracket()
             Do Until objBracketManager.blnLastBracket
-                'Don't number matches that are byes
-                If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
-                    intMatchNum += 1
-                    objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
-                End If
-                Call objBracketManager.NextMatch()
-                If objBracketManager.blnLastMatch Then
-                    'Done numbering current bracket
-                    Call objBracketManager.MarkBracketFinished()
+                'Skip numbering loser's brackets until 1/4 are done
+                If objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
+                OrElse intMatchNum > intOneQuarter Then
+                    'Don't number matches that are byes
+                    If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                        intMatchNum += 1
+                        objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                    End If
+                    Call objBracketManager.NextMatch()
+                    If objBracketManager.blnLastMatch Then
+                        'Done numbering current bracket
+                        Call objBracketManager.MarkBracketFinished()
+                    End If
                 End If
                 Call objBracketManager.NextBracket()
             Loop
@@ -345,6 +456,8 @@ Public Class frmMain
                               Handles btnDump.Click
         Call NumberMatches()
         Call AddNamesToLosersBrackets()
-        Call DumpMatches()
+        'Call DumpMatches()
+        objPrint = New clsPrint(objBracketManager)
+        Call objPrint.PrintAllBrackets()
     End Sub
 End Class
