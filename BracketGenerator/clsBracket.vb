@@ -1,7 +1,9 @@
 Public Enum ce_BracketType
     SingleE = 0
     DoubleEWinner = 1
-    DoubleELoser = 2
+    TwoOutOfThree = 2
+    TrueDouble = 3
+    DoubleELoser = 4
 End Enum
 
 Public Class clsBracket
