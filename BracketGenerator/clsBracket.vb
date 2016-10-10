@@ -1,4 +1,4 @@
-' Copyright (C) 2016 Travis Deshotels
+﻿' Copyright (C) 2016 Travis Deshotels
 '
 ' This program Is free software: you can redistribute it And/Or modify
 ' it under the terms of the GNU General Public License as published by

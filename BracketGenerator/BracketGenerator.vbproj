@@ -73,6 +73,7 @@
     <Compile Include="clsBracketManager.vb" />
     <Compile Include="clsBracket.vb" />
     <Compile Include="clsMatch.vb" />
+    <Compile Include="clsPrint.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
