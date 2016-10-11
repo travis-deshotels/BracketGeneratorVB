@@ -42,30 +42,51 @@ Public Class clsBracketManager
         objBracket = Nothing
     End Sub
 
-    Public Sub DeleteBracket(ByVal v_strDivisionName As String)
+    Public Sub AddBracket(ByRef r_objBracket As clsBracket)
+        r_objBracket.BracketOrder = a_objBrackets.Count
+
+        a_objBrackets.Add(r_objBracket)
+        intCurrentBracket = a_objBrackets.Count - 1
+
+        Call a_intMatchCount.Add(-1)
+    End Sub
+
+    Public Sub DeleteBracket(ByVal v_intBracketIndex As Integer, Optional ByVal v_blnDeleteLBracket As Boolean = False)
         '
-        'Deletes the bracket matching division name
+        'Deletes the bracket matching bracket index
         'Resets the order of each bracket
         'Sets current bracket to end of list
         '
+        'Call a_objBrackets.RemoveAt(v_intBracketIndex)
+        'Call a_intMatchCount.RemoveAt(v_intBracketIndex)
 
-        Call FirstBracket()
-        Do Until blnLastBracket()
-            If objGetCurrentBracket.DivisionName = v_strDivisionName Then
-                Exit Do
-            Else
-                Call NextBracket()
+        'For intCount As Integer = 0 To a_objBrackets.Count - 1
+        '    CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
+        'Next
+
+        'intCurrentBracket = a_objBrackets.Count - 1
+
+        Dim intIndex As Integer = 0
+        Dim intTarget As Integer = v_intBracketIndex
+
+        For Each objBracket In a_objBrackets
+            If CType(objBracket, clsBracket).BracketType = ce_BracketType.DoubleELoser Then
+                intTarget += 1
             End If
-        Loop
-        If objGetCurrentBracket.BracketType = ce_BracketType.DoubleEWinner Then
-            Call a_objBrackets.RemoveAt(intCurrentBracket)
-            Call a_intMatchCount.RemoveAt(intCurrentBracket)
-            'Delete the Loser's bracket too
-            Call a_objBrackets.RemoveAt(intCurrentBracket)
-            Call a_intMatchCount.RemoveAt(intCurrentBracket)
+            If intTarget = intIndex Then
+                Exit For
+            End If
+            intIndex += 1
+        Next
+
+        If v_blnDeleteLBracket Then
+            Call a_objBrackets.RemoveAt(intIndex)
+            Call a_intMatchCount.RemoveAt(intIndex)
+            Call a_objBrackets.RemoveAt(intIndex)
+            Call a_intMatchCount.RemoveAt(intIndex)
         Else
-            Call a_objBrackets.RemoveAt(intCurrentBracket)
-            Call a_intMatchCount.RemoveAt(intCurrentBracket)
+            Call a_objBrackets.RemoveAt(intIndex)
+            Call a_intMatchCount.RemoveAt(intIndex)
         End If
 
         For intCount As Integer = 0 To a_objBrackets.Count - 1
@@ -120,6 +141,28 @@ Public Class clsBracketManager
 
         Call FirstBracket()
     End Sub
+
+    Public Function intGetPlayerCount() As Integer
+        Dim intCount As Integer = 0
+        Select Case objGetCurrentBracket.BracketType
+            Case ce_BracketType.DoubleEWinner, ce_BracketType.SingleE
+                For Each objMatch In objGetCurrentBracket.a_objMatches
+                    If CType(objMatch, clsMatch).player2 <> "bye" AndAlso _
+                       CType(objMatch, clsMatch).player2 <> String.Empty Then
+                        intCount += 2
+                    ElseIf CType(objMatch, clsMatch).player2 = "bye" Then
+                        intCount += 1
+                    End If
+                Next
+            Case ce_BracketType.TrueDouble
+                intCount = 3
+            Case ce_BracketType.TwoOutOfThree
+                intCount = 2
+        End Select
+
+        Return intCount
+    End Function
+
     '
     '  **Bracket iterator implementation**
     '
@@ -137,6 +180,46 @@ Public Class clsBracketManager
 
     Public Function objGetCurrentBracket() As clsBracket
         Return CType(a_objBrackets(intCurrentBracket), clsBracket)
+    End Function
+
+    Public Function objGetBracket(ByVal v_intBracketIndex As Integer) As clsBracket
+        '
+        'Returns the non-Loser's bracket matching bracket index
+        '
+        Dim intIndex As Integer = 0
+        Dim intTarget As Integer = v_intBracketIndex
+
+        For Each objBracket In a_objBrackets
+            If CType(objBracket, clsBracket).BracketType = ce_BracketType.DoubleELoser Then
+                intTarget += 1
+            End If
+            If intTarget = intIndex Then
+                Exit For
+            End If
+            intIndex += 1
+        Next
+
+        Return CType(a_objBrackets(intIndex), clsBracket)
+    End Function
+
+    Public Function objGetLosersBracket(ByVal v_intBracketIndex As Integer) As clsBracket
+        '
+        'Returns Loser's bracket matching bracket index
+        '
+        Dim intIndex As Integer = 0
+        Dim intTarget As Integer = v_intBracketIndex
+
+        For Each objBracket In a_objBrackets
+            If CType(objBracket, clsBracket).BracketType = ce_BracketType.DoubleELoser Then
+                intTarget += 1
+            End If
+            If intTarget = intIndex Then
+                Exit For
+            End If
+            intIndex += 1
+        Next
+
+        Return CType(a_objBrackets(intIndex + 1), clsBracket)
     End Function
     '
     '  **Match Operations**
@@ -278,6 +361,47 @@ Public Class clsBracketManager
 
         Call SortFinishedBrackets()
     End Sub
+
+    'Public Sub AssignBracketMat2(ByVal v_intBracketOrder As Integer)
+    '    If CType(a_objBrackets(v_intBracketOrder), clsBracket).BracketType = ce_BracketType.DoubleEWinner Then
+    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder))
+    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder + 1))
+    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
+    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
+    '    Else
+    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder))
+    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
+    '    End If
+
+    '    For intCount As Integer = 0 To a_objBrackets.Count - 1
+    '        CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
+    '    Next
+
+    '    For intCount As Integer = 0 To a_objMat2Brackets.Count - 1
+    '        CType(a_objMat2Brackets(intCount), clsBracket).BracketOrder = intCount
+    '    Next
+    'End Sub
+
+    'Public Sub AssignBracketMat1(ByVal v_intBracketOrder As Integer)
+    '    If CType(a_objMat2Brackets(v_intBracketOrder), clsBracket).BracketType = ce_BracketType.DoubleEWinner Then
+    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder))
+    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder + 1))
+    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
+    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
+    '    Else
+    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder))
+    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
+    '    End If
+
+    '    For intCount As Integer = 0 To a_objBrackets.Count - 1
+    '        CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
+    '    Next
+
+    '    For intCount As Integer = 0 To a_objMat2Brackets.Count - 1
+    '        CType(a_objMat2Brackets(intCount), clsBracket).BracketOrder = intCount
+    '    Next
+    'End Sub
+
 
     '
     '  Used for processing brackets by level

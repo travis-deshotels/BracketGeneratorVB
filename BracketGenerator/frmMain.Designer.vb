@@ -31,7 +31,7 @@ Partial Class frmMain
         Me.grpBrackets = New System.Windows.Forms.GroupBox
         Me.lstBrackets = New System.Windows.Forms.ListBox
         Me.lblBrackets = New System.Windows.Forms.Label
-        Me.btnDelete = New System.Windows.Forms.Button
+        Me.btnDeleteMat1 = New System.Windows.Forms.Button
         Me.pagAdd = New System.Windows.Forms.TabPage
         Me.grpAddMain = New System.Windows.Forms.GroupBox
         Me.grpNames = New System.Windows.Forms.GroupBox
@@ -47,16 +47,18 @@ Partial Class frmMain
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.pagMats = New System.Windows.Forms.TabPage
         Me.grpMatsMain = New System.Windows.Forms.GroupBox
-        Me.grpUpDown = New System.Windows.Forms.GroupBox
-        Me.btnUp = New System.Windows.Forms.Button
         Me.btnDown = New System.Windows.Forms.Button
+        Me.btnUp = New System.Windows.Forms.Button
         Me.grpmat1 = New System.Windows.Forms.GroupBox
         Me.lstMat1 = New System.Windows.Forms.ListBox
         Me.lblMat1 = New System.Windows.Forms.Label
         Me.grpmat2 = New System.Windows.Forms.GroupBox
+        Me.btnDeleteMat2 = New System.Windows.Forms.Button
         Me.lblMat2 = New System.Windows.Forms.Label
         Me.lstMat2 = New System.Windows.Forms.ListBox
         Me.btnModify = New System.Windows.Forms.Button
+        Me.lblMat1Count = New System.Windows.Forms.Label
+        Me.lblMat2Count = New System.Windows.Forms.Label
         Me.pagDelete.SuspendLayout()
         Me.grpDelMain.SuspendLayout()
         Me.grpDelPlayers.SuspendLayout()
@@ -69,7 +71,6 @@ Partial Class frmMain
         Me.tabMain.SuspendLayout()
         Me.pagMats.SuspendLayout()
         Me.grpMatsMain.SuspendLayout()
-        Me.grpUpDown.SuspendLayout()
         Me.grpmat1.SuspendLayout()
         Me.grpmat2.SuspendLayout()
         Me.SuspendLayout()
@@ -101,7 +102,7 @@ Partial Class frmMain
         Me.grpDelMain.Controls.Add(Me.grpBrackets)
         Me.grpDelMain.Location = New System.Drawing.Point(8, 3)
         Me.grpDelMain.Name = "grpDelMain"
-        Me.grpDelMain.Size = New System.Drawing.Size(572, 346)
+        Me.grpDelMain.Size = New System.Drawing.Size(572, 343)
         Me.grpDelMain.TabIndex = 104
         Me.grpDelMain.TabStop = False
         '
@@ -137,10 +138,9 @@ Partial Class frmMain
         '
         Me.grpBrackets.Controls.Add(Me.lstBrackets)
         Me.grpBrackets.Controls.Add(Me.lblBrackets)
-        Me.grpBrackets.Controls.Add(Me.btnDelete)
-        Me.grpBrackets.Location = New System.Drawing.Point(81, 19)
+        Me.grpBrackets.Location = New System.Drawing.Point(81, 5)
         Me.grpBrackets.Name = "grpBrackets"
-        Me.grpBrackets.Size = New System.Drawing.Size(402, 142)
+        Me.grpBrackets.Size = New System.Drawing.Size(402, 158)
         Me.grpBrackets.TabIndex = 104
         Me.grpBrackets.TabStop = False
         '
@@ -149,7 +149,7 @@ Partial Class frmMain
         Me.lstBrackets.FormattingEnabled = True
         Me.lstBrackets.Location = New System.Drawing.Point(6, 28)
         Me.lstBrackets.Name = "lstBrackets"
-        Me.lstBrackets.Size = New System.Drawing.Size(297, 108)
+        Me.lstBrackets.Size = New System.Drawing.Size(390, 108)
         Me.lstBrackets.TabIndex = 99
         '
         'lblBrackets
@@ -161,14 +161,14 @@ Partial Class frmMain
         Me.lblBrackets.TabIndex = 101
         Me.lblBrackets.Text = "Brackets"
         '
-        'btnDelete
+        'btnDeleteMat1
         '
-        Me.btnDelete.Location = New System.Drawing.Point(321, 113)
-        Me.btnDelete.Name = "btnDelete"
-        Me.btnDelete.Size = New System.Drawing.Size(75, 23)
-        Me.btnDelete.TabIndex = 100
-        Me.btnDelete.Text = "Delete"
-        Me.btnDelete.UseVisualStyleBackColor = True
+        Me.btnDeleteMat1.Location = New System.Drawing.Point(390, 68)
+        Me.btnDeleteMat1.Name = "btnDeleteMat1"
+        Me.btnDeleteMat1.Size = New System.Drawing.Size(75, 23)
+        Me.btnDeleteMat1.TabIndex = 100
+        Me.btnDeleteMat1.Text = "Delete"
+        Me.btnDeleteMat1.UseVisualStyleBackColor = True
         '
         'pagAdd
         '
@@ -308,65 +308,58 @@ Partial Class frmMain
         '
         'grpMatsMain
         '
-        Me.grpMatsMain.Controls.Add(Me.grpUpDown)
+        Me.grpMatsMain.Controls.Add(Me.btnDown)
+        Me.grpMatsMain.Controls.Add(Me.btnUp)
         Me.grpMatsMain.Controls.Add(Me.grpmat1)
         Me.grpMatsMain.Controls.Add(Me.grpmat2)
-        Me.grpMatsMain.Location = New System.Drawing.Point(3, 6)
+        Me.grpMatsMain.Location = New System.Drawing.Point(7, 2)
         Me.grpMatsMain.Name = "grpMatsMain"
-        Me.grpMatsMain.Size = New System.Drawing.Size(577, 346)
+        Me.grpMatsMain.Size = New System.Drawing.Size(572, 343)
         Me.grpMatsMain.TabIndex = 9
         Me.grpMatsMain.TabStop = False
         '
-        'grpUpDown
-        '
-        Me.grpUpDown.Controls.Add(Me.btnUp)
-        Me.grpUpDown.Controls.Add(Me.btnDown)
-        Me.grpUpDown.Location = New System.Drawing.Point(199, 143)
-        Me.grpUpDown.Name = "grpUpDown"
-        Me.grpUpDown.Size = New System.Drawing.Size(169, 41)
-        Me.grpUpDown.TabIndex = 8
-        Me.grpUpDown.TabStop = False
-        '
-        'btnUp
-        '
-        Me.btnUp.Location = New System.Drawing.Point(6, 12)
-        Me.btnUp.Name = "btnUp"
-        Me.btnUp.Size = New System.Drawing.Size(75, 23)
-        Me.btnUp.TabIndex = 6
-        Me.btnUp.Text = "Up"
-        Me.btnUp.UseVisualStyleBackColor = True
-        '
         'btnDown
         '
-        Me.btnDown.Location = New System.Drawing.Point(87, 12)
+        Me.btnDown.Location = New System.Drawing.Point(277, 160)
         Me.btnDown.Name = "btnDown"
         Me.btnDown.Size = New System.Drawing.Size(75, 23)
         Me.btnDown.TabIndex = 7
         Me.btnDown.Text = "Down"
         Me.btnDown.UseVisualStyleBackColor = True
         '
+        'btnUp
+        '
+        Me.btnUp.Location = New System.Drawing.Point(196, 160)
+        Me.btnUp.Name = "btnUp"
+        Me.btnUp.Size = New System.Drawing.Size(75, 23)
+        Me.btnUp.TabIndex = 6
+        Me.btnUp.Text = "Up"
+        Me.btnUp.UseVisualStyleBackColor = True
+        '
         'grpmat1
         '
+        Me.grpmat1.Controls.Add(Me.lblMat1Count)
         Me.grpmat1.Controls.Add(Me.lstMat1)
         Me.grpmat1.Controls.Add(Me.lblMat1)
-        Me.grpmat1.Location = New System.Drawing.Point(92, 4)
+        Me.grpmat1.Controls.Add(Me.btnDeleteMat1)
+        Me.grpmat1.Location = New System.Drawing.Point(47, 3)
         Me.grpmat1.Name = "grpmat1"
-        Me.grpmat1.Size = New System.Drawing.Size(390, 140)
+        Me.grpmat1.Size = New System.Drawing.Size(470, 155)
         Me.grpmat1.TabIndex = 4
         Me.grpmat1.TabStop = False
         '
         'lstMat1
         '
         Me.lstMat1.FormattingEnabled = True
-        Me.lstMat1.Location = New System.Drawing.Point(6, 25)
+        Me.lstMat1.Location = New System.Drawing.Point(6, 28)
         Me.lstMat1.Name = "lstMat1"
-        Me.lstMat1.Size = New System.Drawing.Size(378, 108)
+        Me.lstMat1.Size = New System.Drawing.Size(378, 121)
         Me.lstMat1.TabIndex = 0
         '
         'lblMat1
         '
         Me.lblMat1.AutoSize = True
-        Me.lblMat1.Location = New System.Drawing.Point(6, 9)
+        Me.lblMat1.Location = New System.Drawing.Point(6, 10)
         Me.lblMat1.Name = "lblMat1"
         Me.lblMat1.Size = New System.Drawing.Size(34, 13)
         Me.lblMat1.TabIndex = 2
@@ -374,13 +367,24 @@ Partial Class frmMain
         '
         'grpmat2
         '
+        Me.grpmat2.Controls.Add(Me.lblMat2Count)
+        Me.grpmat2.Controls.Add(Me.btnDeleteMat2)
         Me.grpmat2.Controls.Add(Me.lblMat2)
         Me.grpmat2.Controls.Add(Me.lstMat2)
-        Me.grpmat2.Location = New System.Drawing.Point(92, 183)
+        Me.grpmat2.Location = New System.Drawing.Point(47, 179)
         Me.grpmat2.Name = "grpmat2"
-        Me.grpmat2.Size = New System.Drawing.Size(390, 160)
+        Me.grpmat2.Size = New System.Drawing.Size(470, 160)
         Me.grpmat2.TabIndex = 5
         Me.grpmat2.TabStop = False
+        '
+        'btnDeleteMat2
+        '
+        Me.btnDeleteMat2.Location = New System.Drawing.Point(390, 84)
+        Me.btnDeleteMat2.Name = "btnDeleteMat2"
+        Me.btnDeleteMat2.Size = New System.Drawing.Size(75, 23)
+        Me.btnDeleteMat2.TabIndex = 4
+        Me.btnDeleteMat2.Text = "Delete"
+        Me.btnDeleteMat2.UseVisualStyleBackColor = True
         '
         'lblMat2
         '
@@ -408,6 +412,24 @@ Partial Class frmMain
         Me.btnModify.TabIndex = 100
         Me.btnModify.Text = "Modify"
         Me.btnModify.UseVisualStyleBackColor = True
+        '
+        'lblMat1Count
+        '
+        Me.lblMat1Count.AutoSize = True
+        Me.lblMat1Count.Location = New System.Drawing.Point(403, 136)
+        Me.lblMat1Count.Name = "lblMat1Count"
+        Me.lblMat1Count.Size = New System.Drawing.Size(13, 13)
+        Me.lblMat1Count.TabIndex = 101
+        Me.lblMat1Count.Text = "0"
+        '
+        'lblMat2Count
+        '
+        Me.lblMat2Count.AutoSize = True
+        Me.lblMat2Count.Location = New System.Drawing.Point(406, 146)
+        Me.lblMat2Count.Name = "lblMat2Count"
+        Me.lblMat2Count.Size = New System.Drawing.Size(13, 13)
+        Me.lblMat2Count.TabIndex = 5
+        Me.lblMat2Count.Text = "0"
         '
         'frmMain
         '
@@ -440,7 +462,6 @@ Partial Class frmMain
         Me.tabMain.ResumeLayout(False)
         Me.pagMats.ResumeLayout(False)
         Me.grpMatsMain.ResumeLayout(False)
-        Me.grpUpDown.ResumeLayout(False)
         Me.grpmat1.ResumeLayout(False)
         Me.grpmat1.PerformLayout()
         Me.grpmat2.ResumeLayout(False)
@@ -452,7 +473,7 @@ Partial Class frmMain
     Friend WithEvents pagDelete As System.Windows.Forms.TabPage
     Friend WithEvents lstBrackets As System.Windows.Forms.ListBox
     Friend WithEvents lblNames As System.Windows.Forms.Label
-    Friend WithEvents btnDelete As System.Windows.Forms.Button
+    Friend WithEvents btnDeleteMat1 As System.Windows.Forms.Button
     Friend WithEvents lstNames As System.Windows.Forms.ListBox
     Friend WithEvents lblBrackets As System.Windows.Forms.Label
     Friend WithEvents pagAdd As System.Windows.Forms.TabPage
@@ -480,8 +501,10 @@ Partial Class frmMain
     Friend WithEvents lblMat2 As System.Windows.Forms.Label
     Friend WithEvents grpmat1 As System.Windows.Forms.GroupBox
     Friend WithEvents grpMatsMain As System.Windows.Forms.GroupBox
-    Friend WithEvents grpUpDown As System.Windows.Forms.GroupBox
-    Friend WithEvents btnUp As System.Windows.Forms.Button
     Friend WithEvents btnDown As System.Windows.Forms.Button
+    Friend WithEvents btnUp As System.Windows.Forms.Button
+    Friend WithEvents btnDeleteMat2 As System.Windows.Forms.Button
+    Friend WithEvents lblMat1Count As System.Windows.Forms.Label
+    Friend WithEvents lblMat2Count As System.Windows.Forms.Label
 
 End Class

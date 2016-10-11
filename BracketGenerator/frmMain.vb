@@ -1,7 +1,8 @@
 Imports System.IO
 
 Public Class frmMain
-    Private objBracketManager As clsBracketManager
+    Private objMat1Manager As clsBracketManager
+    Private objMat2Manager As clsBracketManager
     Private objPrint As clsPrint
     Const c_AutoIndex As Integer = 0
 
@@ -9,7 +10,9 @@ Public Class frmMain
                              ByVal e As System.EventArgs) _
                              Handles MyBase.Load
 
-        objBracketManager = New clsBracketManager
+        objMat1Manager = New clsBracketManager
+        objMat2Manager = New clsBracketManager
+
         lstBracketType.Items.Add("AUTO")
         lstBracketType.Items.Add("Single Elimation")
         lstBracketType.Items.Add("Modified Double")
@@ -55,6 +58,7 @@ Public Class frmMain
                             Call CreateBracket(ce_BracketType.DoubleEWinner)
                     End Select
             End Select
+            Call LoadBracketNames()
         End If
     End Sub
 
@@ -149,22 +153,22 @@ Public Class frmMain
         intMatchCount = intPlayerCount - 1
 
         If ve_Type = ce_BracketType.SingleE Then
-            Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.SingleE)
+            Call objMat1Manager.AddBracket(txtDivisionName.Text, ce_BracketType.SingleE)
         ElseIf ve_Type = ce_BracketType.DoubleEWinner Then
-            Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.DoubleEWinner)
+            Call objMat1Manager.AddBracket(txtDivisionName.Text, ce_BracketType.DoubleEWinner)
         End If
 
         For intPlayerIndex = 0 To intBracketSize - 1 Step 2
-            objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
+            objMat1Manager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
                                        CStr(objPlayersList(intPlayerIndex + 1)))
             intCurrentMatchNum += 1
         Next
         'Insert placeholders
         For intMatchIndex = intCurrentMatchNum To intMatchCount - 1 Step 1
-            objBracketManager.AddMatch(String.Empty, String.Empty)
+            objMat1Manager.AddMatch(String.Empty, String.Empty)
         Next
 
-        Call LoadBracketNames()
+        'Call LoadBracketNames()
 
         If ve_Type = ce_BracketType.DoubleEWinner Then
             Call CreateLosersBracket(intPlayersEntered - 1)
@@ -183,11 +187,12 @@ Public Class frmMain
         a_strNames = Split(txtNames.Text, vbNewLine)
         Call ClearNewLines(a_strNames)
 
-        Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.TwoOutOfThree)
-        Call objBracketManager.AddMatch(a_strNames(0), a_strNames(1))
-        Call objBracketManager.AddMatch(String.Empty, String.Empty)
-        Call objBracketManager.AddMatch(String.Empty, String.Empty)
-        Call LoadBracketNames()
+        Call objMat1Manager.AddBracket(txtDivisionName.Text, ce_BracketType.TwoOutOfThree)
+        Call objMat1Manager.AddMatch(a_strNames(0), a_strNames(1))
+        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+        'Call LoadBracketNames()
+
         txtNames.Text = String.Empty
         txtDivisionName.Text = String.Empty
     End Sub
@@ -198,19 +203,20 @@ Public Class frmMain
         a_strNames = Split(txtNames.Text, vbNewLine)
         Call ClearNewLines(a_strNames)
 
-        Call objBracketManager.AddBracket(txtDivisionName.Text, ce_BracketType.TrueDouble)
-        Call objBracketManager.AddMatch(a_strNames(0), a_strNames(1))
-        Call objBracketManager.AddMatch(a_strNames(2), "bye")
-        Call objBracketManager.AddMatch(String.Empty, "bye")
-        Call objBracketManager.AddMatch("bye", "bye")
+        Call objMat1Manager.AddBracket(txtDivisionName.Text, ce_BracketType.TrueDouble)
+        Call objMat1Manager.AddMatch(a_strNames(0), a_strNames(1))
+        Call objMat1Manager.AddMatch(a_strNames(2), "bye")
+        Call objMat1Manager.AddMatch(String.Empty, "bye")
+        Call objMat1Manager.AddMatch("bye", "bye")
 
-        Call objBracketManager.AddMatch(String.Empty, a_strNames(2))
-        Call objBracketManager.AddMatch(String.Empty, String.Empty)
+        Call objMat1Manager.AddMatch(String.Empty, a_strNames(2))
+        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
 
-        Call objBracketManager.AddMatch(String.Empty, String.Empty)
+        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
 
-        Call objBracketManager.AddMatch(String.Empty, String.Empty)
-        Call LoadBracketNames()
+        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+        'Call LoadBracketNames()
+
         txtNames.Text = String.Empty
         txtDivisionName.Text = String.Empty
     End Sub
@@ -240,15 +246,15 @@ Public Class frmMain
         intPlayerCount = objPlayersList.Count
         intMatchCount = intPlayerCount - 1
 
-        Call objBracketManager.AddBracket(txtDivisionName.Text & " Loser's Bracket", ce_BracketType.DoubleELoser)
+        Call objMat1Manager.AddBracket(txtDivisionName.Text & " Loser's Bracket", ce_BracketType.DoubleELoser)
         For intPlayerIndex = 0 To intBracketSize - 1 Step 2
-            objBracketManager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
+            objMat1Manager.AddMatch(CStr(objPlayersList(intPlayerIndex)), _
                                        CStr(objPlayersList(intPlayerIndex + 1)))
             intCurrentMatchNum += 1
         Next
         'Insert placeholders
         For intMatchIndex = intCurrentMatchNum To intMatchCount - 1 Step 1
-            objBracketManager.AddMatch(String.Empty, String.Empty)
+            objMat1Manager.AddMatch(String.Empty, String.Empty)
         Next
 
         a_strNames = Nothing
@@ -348,259 +354,274 @@ Public Class frmMain
         'Displays each bracket and its matches
         'Used for debugging
         '
-        Call objBracketManager.MarkBracketsReady()
-
+        Dim objBracketManager As clsBracketManager
         Dim objMatch As New clsMatch
         Dim FileWriter As IO.StreamWriter
         Dim intMatchNumberBye As Integer = 0
         Dim e_Color As ce_MatchColor = ce_MatchColor.e_Blue
 
         FileWriter = New IO.StreamWriter(System.Environment.CurrentDirectory & "\test.txt")
-        FileWriter.Write("Brackets")
+        objBracketManager = objMat1Manager
+        FileWriter.Write("Mat 1")
         FileWriter.WriteLine()
         FileWriter.WriteLine()
-        Call objBracketManager.FirstBracket()
-        Do Until objBracketManager.blnLastBracket
-            'Print Bracket Name
-            FileWriter.Write(objBracketManager.objGetCurrentBracket. _
-                             DivisionName & ":")
-            FileWriter.WriteLine()                                      'line break
+
+        For intCount As Integer = 0 To 1
+
+            Call objBracketManager.MarkBracketsReady()
+            FileWriter.Write("Brackets")
             FileWriter.WriteLine()
-            'Call objBracketManager.FirstMatch()
-            Call objBracketManager.LevelStart()                         'print by bracket level
-            While True
-                objMatch = objBracketManager.objGetCurrentMatch()
-                'Print Match
-                If Not objMatch.matchNumber = 0 Then
-                    FileWriter.Write(objMatch.matchNumber & vbTab)
-                Else
-                    FileWriter.Write("*" & vbTab)
-                End If
-                FileWriter.Write(objMatch.player1 & " - ")
-                FileWriter.Write(objMatch.player2)
+            FileWriter.WriteLine()
+            Call objBracketManager.FirstBracket()
+            Do Until objBracketManager.blnLastBracket
+                'Print Bracket Name
+                FileWriter.Write(objBracketManager.objGetCurrentBracket. _
+                                 DivisionName & ":")
+                FileWriter.WriteLine()                                      'line break
                 FileWriter.WriteLine()
-                If objBracketManager.blnLevelIsDone Then
+                'Call objBracketManager.FirstMatch()
+                Call objBracketManager.LevelStart()                         'print by bracket level
+                While True
+                    objMatch = objBracketManager.objGetCurrentMatch()
+                    'Print Match
+                    If Not objMatch.matchNumber = 0 Then
+                        FileWriter.Write(objMatch.matchNumber & vbTab)
+                    Else
+                        FileWriter.Write("*" & vbTab)
+                    End If
+                    FileWriter.Write(objMatch.player1 & " - ")
+                    FileWriter.Write(objMatch.player2)
                     FileWriter.WriteLine()
-                End If
+                    If objBracketManager.blnLevelIsDone Then
+                        FileWriter.WriteLine()
+                    End If
 
-                Call objBracketManager.NextMatch()
-                If objBracketManager.blnLastMatch Then
-                    Exit While
-                End If
-            End While
+                    Call objBracketManager.NextMatch()
+                    If objBracketManager.blnLastMatch Then
+                        Exit While
+                    End If
+                End While
+                FileWriter.WriteLine()
+                Call objBracketManager.NextBracket()
+            Loop
             FileWriter.WriteLine()
-            Call objBracketManager.NextBracket()
-        Loop
-        FileWriter.WriteLine()
-        FileWriter.WriteLine()
-        FileWriter.Write("Match Cards")
-        FileWriter.WriteLine()
-        FileWriter.WriteLine()
-        Call objBracketManager.MarkBracketsReady()
+            FileWriter.WriteLine()
+            FileWriter.Write("Match Cards")
+            FileWriter.WriteLine()
+            FileWriter.WriteLine()
+            Call objBracketManager.MarkBracketsReady()
 
-        'Print Match Cards
-        'Call objBracketManager.FirstBracket()
-        'Do Until objBracketManager.blnLastBracket
-        '    Select objBracketManager.objGetCurrentBracket.BracketType
-        '        Case ce_BracketType.DoubleEWinner, ce_BracketType.SingleE
-        '            Call objBracketManager.LevelStart()
-        '            While True
-        '                FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
-        '                If objBracketManager.objGetCurrentMatch.player2 = "bye" Then
-        '                    Call objBracketManager.intGetMatchNumberBye(intMatchNumberBye, e_Color)
-        '                    If e_Color = ce_MatchColor.e_Blue Then
-        '                        FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "Blue")
-        '                    Else
-        '                        FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "White")
-        '                    End If
-        '                Else
-        '                    FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
-        '                End If
-        '                FileWriter.WriteLine()
+            'Print Match Cards
+            Call objBracketManager.FirstBracket()
+            Do Until objBracketManager.blnLastBracket
+                Select Case objBracketManager.objGetCurrentBracket.BracketType
+                    Case ce_BracketType.DoubleEWinner, ce_BracketType.SingleE
+                        Call objBracketManager.LevelStart()
+                        While True
+                            FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
+                            If objBracketManager.objGetCurrentMatch.player2 = "bye" Then
+                                Call objBracketManager.intGetMatchNumberBye(intMatchNumberBye, e_Color)
+                                If e_Color = ce_MatchColor.e_Blue Then
+                                    FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "Blue")
+                                Else
+                                    FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "White")
+                                End If
+                            Else
+                                FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
+                            End If
+                            FileWriter.WriteLine()
 
-        '                If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
-        '                    FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
-        '                    FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "White")
-        '                    FileWriter.WriteLine()
-        '                End If
+                            If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                                FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
+                                FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "White")
+                                FileWriter.WriteLine()
+                            End If
 
-        '                If objBracketManager.blnLevelIsDone Then
-        '                    Exit While
-        '                End If
-        '                Call objBracketManager.NextMatch()
-        '            End While
-        '        Case ce_BracketType.TrueDouble
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
-        '            FileWriter.WriteLine()
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "White")
-        '            FileWriter.WriteLine()
-        '            Call objBracketManager.NextMatch()
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
-        '            Call objBracketManager.intGetMatchNumberBye(intMatchNumberBye, e_Color)
-        '            FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "Blue")
-        '            FileWriter.WriteLine()
+                            If objBracketManager.blnLevelIsDone Then
+                                Exit While
+                            End If
+                            Call objBracketManager.NextMatch()
+                        End While
+                    Case ce_BracketType.TrueDouble
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
+                        FileWriter.WriteLine()
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "White")
+                        FileWriter.WriteLine()
+                        Call objBracketManager.NextMatch()
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
+                        Call objBracketManager.intGetMatchNumberBye(intMatchNumberBye, e_Color)
+                        FileWriter.Write(CStr(intMatchNumberBye) & vbTab & "Blue")
+                        FileWriter.WriteLine()
 
-        '        Case ce_BracketType.TwoOutOfThree
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
-        '            FileWriter.WriteLine()
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
-        '            FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
-        '            FileWriter.WriteLine()
-        '    End Select
+                    Case ce_BracketType.TwoOutOfThree
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player1 & vbTab & vbTab)
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
+                        FileWriter.WriteLine()
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.player2 & vbTab & vbTab)
+                        FileWriter.Write(objBracketManager.objGetCurrentMatch.matchNumber & vbTab & "Blue")
+                        FileWriter.WriteLine()
+                End Select
 
-        '    Call objBracketManager.NextBracket()
-        'Loop
-
+                Call objBracketManager.NextBracket()
+            Loop
+            objBracketManager = objMat2Manager
+            If intCount = 0 Then
+                FileWriter.WriteLine()
+                FileWriter.WriteLine()
+                FileWriter.Write("Mat 2")
+                FileWriter.WriteLine()
+                FileWriter.WriteLine()
+            End If
+        Next
         FileWriter.Close()
     End Sub
 
-    Private Sub NumberMatches()
+    Private Sub NumberMatches(ByRef r_objBracketManager As clsBracketManager)
         Dim intMatchNum As Integer = 0
-        Dim intOneQuarter As Integer = CInt(objBracketManager.intGetTotalMatchCount / 4)
+        Dim intOneQuarter As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 4)
 
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
 
-        While Not objBracketManager.blnBracketsFinished
-            Call objBracketManager.FirstBracket()
-            Do Until objBracketManager.blnLastBracket
+        While Not r_objBracketManager.blnBracketsFinished
+            Call r_objBracketManager.FirstBracket()
+            Do Until r_objBracketManager.blnLastBracket
                 'Skip numbering loser's brackets until 1/4 are done
-                If objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
+                If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
                 OrElse intMatchNum > intOneQuarter Then
                     'Don't number matches that are byes
-                    If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                    If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
                         intMatchNum += 1
-                        objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
                     End If
-                    Call objBracketManager.NextMatch()
-                    If objBracketManager.blnLastMatch Then
+                    Call r_objBracketManager.NextMatch()
+                    If r_objBracketManager.blnLastMatch Then
                         'Done numbering current bracket
-                        Call objBracketManager.MarkBracketFinished()
+                        Call r_objBracketManager.MarkBracketFinished()
                     End If
                 End If
-                Call objBracketManager.NextBracket()
+                Call r_objBracketManager.NextBracket()
             Loop
         End While
 
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
     End Sub
 
-    Private Sub NumberMatches2()
-        Dim intMatchNum As Integer = 0
-        Dim blnFirstRoundDone = False
+    'Private Sub NumberMatches2()
+    '    Dim intMatchNum As Integer = 0
+    '    Dim blnFirstRoundDone = False
 
-        Call objBracketManager.MarkBracketsReady()
+    '    Call objBracketManager.MarkBracketsReady()
 
-        While Not objBracketManager.blnBracketsFinished
-            Call objBracketManager.FirstBracket()
-            Do Until objBracketManager.blnLastBracket
-                If objBracketManager.objGetCurrentBracket.BracketType <> _
-                ce_BracketType.DoubleELoser OrElse blnFirstRoundDone Then
-                    If Not blnFirstRoundDone Then
-                        Call objBracketManager.LevelStart()
-                    End If
+    '    While Not objBracketManager.blnBracketsFinished
+    '        Call objBracketManager.FirstBracket()
+    '        Do Until objBracketManager.blnLastBracket
+    '            If objBracketManager.objGetCurrentBracket.BracketType <> _
+    '            ce_BracketType.DoubleELoser OrElse blnFirstRoundDone Then
+    '                If Not blnFirstRoundDone Then
+    '                    Call objBracketManager.LevelStart()
+    '                End If
 
-                    While True
-                        'Don't number matches that are byes
-                        If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
-                            intMatchNum += 1
-                            objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
-                        End If
-                        Call objBracketManager.NextMatch()
-                        If objBracketManager.blnLastMatch Then
-                            'Done numbering current bracket
-                            Call objBracketManager.MarkBracketFinished()
-                            Exit While
-                        ElseIf objBracketManager.blnLevelIsDone Then
-                            Exit While
-                        End If
+    '                While True
+    '                    'Don't number matches that are byes
+    '                    If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+    '                        intMatchNum += 1
+    '                        objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+    '                    End If
+    '                    Call objBracketManager.NextMatch()
+    '                    If objBracketManager.blnLastMatch Then
+    '                        'Done numbering current bracket
+    '                        Call objBracketManager.MarkBracketFinished()
+    '                        Exit While
+    '                    ElseIf objBracketManager.blnLevelIsDone Then
+    '                        Exit While
+    '                    End If
 
-                    End While
-                End If
-                Call objBracketManager.NextBracket()
-            Loop
-            blnFirstRoundDone = True
-        End While
+    '                End While
+    '            End If
+    '            Call objBracketManager.NextBracket()
+    '        Loop
+    '        blnFirstRoundDone = True
+    '    End While
 
-        Call objBracketManager.MarkBracketsReady()
-    End Sub
+    '    Call objBracketManager.MarkBracketsReady()
+    'End Sub
 
-    Private Sub AddNamesToLosersBrackets()
+    Private Sub AddNamesToLosersBrackets(ByRef r_objBracketManager As clsBracketManager)
         Dim intMatchNumber As Integer
         Dim blnDone As Boolean = False
 
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
 
         'Skip any non modified double brackets
-        Call objBracketManager.FirstBracket()
-        Do Until objBracketManager.blnLastBracket
-            If objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.SingleE OrElse _
-               objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TrueDouble OrElse _
-               objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TwoOutOfThree Then
-                Call objBracketManager.MarkBracketFinished()
+        Call r_objBracketManager.FirstBracket()
+        Do Until r_objBracketManager.blnLastBracket
+            If r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.SingleE OrElse _
+               r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TrueDouble OrElse _
+               r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TwoOutOfThree Then
+                Call r_objBracketManager.MarkBracketFinished()
             End If
-            Call objBracketManager.NextBracket()
+            Call r_objBracketManager.NextBracket()
         Loop
 
-        While Not objBracketManager.blnBracketsFinished
-            Call objBracketManager.FirstBracket()
+        While Not r_objBracketManager.blnBracketsFinished
+            Call r_objBracketManager.FirstBracket()
 
-            Do Until objBracketManager.blnLastBracket
+            Do Until r_objBracketManager.blnLastBracket
                 'This starts at a winner's bracket
-                If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
                     'non-bye match, so store the number
-                    intMatchNumber = objBracketManager.objGetCurrentMatch.matchNumber
-                    Call objBracketManager.NextMatch()
-                    If objBracketManager.blnLastMatch Then
-                        Call objBracketManager.MarkBracketFinished()
+                    intMatchNumber = r_objBracketManager.objGetCurrentMatch.matchNumber
+                    Call r_objBracketManager.NextMatch()
+                    If r_objBracketManager.blnLastMatch Then
+                        Call r_objBracketManager.MarkBracketFinished()
                         blnDone = True
                     End If
 
-                    Call objBracketManager.NextBracket()
+                    Call r_objBracketManager.NextBracket()
 
                     'Now at loser's bracket
-                    If objBracketManager.objGetCurrentMatch.player2 = "bye" Then
-                        objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
+                    If r_objBracketManager.objGetCurrentMatch.player2 = "bye" Then
+                        r_objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
                         If blnDone Then
-                            Call objBracketManager.MarkBracketFinished()
+                            Call r_objBracketManager.MarkBracketFinished()
                             blnDone = False
                         Else
-                            Call objBracketManager.NextMatch()
+                            Call r_objBracketManager.NextMatch()
                         End If
-                    ElseIf objBracketManager.objGetCurrentMatch.player1 = String.Empty Then
-                        objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
+                    ElseIf r_objBracketManager.objGetCurrentMatch.player1 = String.Empty Then
+                        r_objBracketManager.objGetCurrentMatch.player1 = "L-" & CStr(intMatchNumber)
                         'fix?
                         'If blnDone Then
-                        '    Call objBracketManager.MarkBracketFinished()
+                        '    Call r_objBracketManager.MarkBracketFinished()
                         '    blnDone = False
                         'End If
                     Else
                         'It's a non-bye and player 1 is named, so name player 2
-                        objBracketManager.objGetCurrentMatch.player2 = "L-" & CStr(intMatchNumber)
+                        r_objBracketManager.objGetCurrentMatch.player2 = "L-" & CStr(intMatchNumber)
                         If blnDone Then
-                            Call objBracketManager.MarkBracketFinished()
+                            Call r_objBracketManager.MarkBracketFinished()
                             blnDone = False
                         Else
-                            Call objBracketManager.NextMatch()
+                            Call r_objBracketManager.NextMatch()
                         End If
                     End If
 
                     'Go to next winner's bracket
-                    Call objBracketManager.NextBracket()
+                    Call r_objBracketManager.NextBracket()
 
                 Else
                     'Skip to the next winner's bracket
-                    Call objBracketManager.NextMatch()
-                    Call objBracketManager.NextBracket()
-                    Call objBracketManager.NextBracket()
+                    Call r_objBracketManager.NextMatch()
+                    Call r_objBracketManager.NextBracket()
+                    Call r_objBracketManager.NextBracket()
                 End If
             Loop
 
         End While
 
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
 
     End Sub
 
@@ -616,15 +637,26 @@ Public Class frmMain
             txtDivisionName.Enabled = False
             txtNames.Enabled = False
             btnAddBracket.Enabled = False
-            btnDelete.Enabled = False
+            btnDeleteMat1.Enabled = False
+            btnDeleteMat2.Enabled = False
+            btnUp.Enabled = False
+            btnDown.Enabled = False
 
-            Call NumberMatches()
-            Call AddNamesToLosersBrackets()
+            If objMat1Manager.intGetTotalMatchCount > 0 Then
+                Call NumberMatches(objMat1Manager)
+                Call AddNamesToLosersBrackets(objMat1Manager)
+            End If
+
+            If objMat2Manager.intGetTotalMatchCount > 0 Then
+                Call NumberMatches(objMat2Manager)
+                Call AddNamesToLosersBrackets(objMat2Manager)
+            End If
 
             Call DumpMatches()
-            'objPrint = New clsPrint(objBracketManager)
+            'objPrint = New clsPrint(objMat1Manager)
             'Call objPrint.PrintAllBrackets()
-            Call objBracketManager.MarkBracketsReady()
+            Call objMat1Manager.MarkBracketsReady()
+            Call objMat2Manager.MarkBracketsReady()
             btnModify.Enabled = True
         End If
 
@@ -633,37 +665,49 @@ Public Class frmMain
     Private Sub lstBrackets_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
                                                  Handles lstBrackets.SelectedIndexChanged
         If Not IsNothing(lstBrackets.SelectedItem) Then
-            Call objBracketManager.MarkBracketsReady()
-            Call objBracketManager.FirstBracket()
-            Do Until objBracketManager.blnLastBracket
-                If objBracketManager.objGetCurrentBracket.DivisionName = _
+            Call objMat1Manager.MarkBracketsReady()
+            Call objMat1Manager.FirstBracket()
+            Do Until objMat1Manager.blnLastBracket
+                If "  " & objMat1Manager.objGetCurrentBracket.DivisionName = _
                    CStr(lstBrackets.SelectedItem) Then
-                    Call LoadNames()
+                    Call LoadNames(objMat1Manager)
                     Exit Sub
                 End If
-                Call objBracketManager.NextBracket()
+                Call objMat1Manager.NextBracket()
             Loop
+
+            Call objMat2Manager.MarkBracketsReady()
+            Call objMat2Manager.FirstBracket()
+            Do Until objMat2Manager.blnLastBracket
+                If "  " & objMat2Manager.objGetCurrentBracket.DivisionName = _
+                   CStr(lstBrackets.SelectedItem) Then
+                    Call LoadNames(objMat2Manager)
+                    Exit Sub
+                End If
+                Call objMat2Manager.NextBracket()
+            Loop
+
         End If
     End Sub
 
-    Private Sub LoadNames()
+    Private Sub LoadNames(ByRef r_objBracketManager As clsBracketManager)
         'Loads list of player names for selected bracket
         Dim strPlayer1 As String
         Dim strPlayer2 As String
 
         Call lstNames.Items.Clear()
 
-        If objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TrueDouble Then
-            Call lstNames.Items.Add(objBracketManager.objGetCurrentMatch.player1)
-            Call lstNames.Items.Add(objBracketManager.objGetCurrentMatch.player2)
+        If r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.TrueDouble Then
+            Call lstNames.Items.Add(r_objBracketManager.objGetCurrentMatch.player1)
+            Call lstNames.Items.Add(r_objBracketManager.objGetCurrentMatch.player2)
 
-            Call objBracketManager.NextMatch()
+            Call r_objBracketManager.NextMatch()
 
-            Call lstNames.Items.Add(objBracketManager.objGetCurrentMatch.player1)
+            Call lstNames.Items.Add(r_objBracketManager.objGetCurrentMatch.player1)
         Else
-            Do Until objBracketManager.blnLastMatch
-                strPlayer1 = objBracketManager.objGetCurrentMatch.player1
-                strPlayer2 = objBracketManager.objGetCurrentMatch.player2
+            Do Until r_objBracketManager.blnLastMatch
+                strPlayer1 = r_objBracketManager.objGetCurrentMatch.player1
+                strPlayer2 = r_objBracketManager.objGetCurrentMatch.player2
                 If strPlayer1 <> String.Empty AndAlso strPlayer1 <> "bye" Then
                     Call lstNames.Items.Add(strPlayer1)
                 End If
@@ -671,94 +715,229 @@ Public Class frmMain
                     Call lstNames.Items.Add(strPlayer2)
                 End If
 
-                Call objBracketManager.NextMatch()
+                Call r_objBracketManager.NextMatch()
             Loop
         End If
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
     End Sub
 
     Private Sub LoadBracketNames()
+        Dim intPlayerCount As Integer = 0
+        Dim intTotalPlayerCount As Integer = 0
         Call lstBrackets.Items.Clear()
+        Call lstMat1.Items.Clear()
+        Call lstMat2.Items.Clear()
 
-        Call objBracketManager.MarkBracketsReady()
+        'Load Mat 1
+        Call lstBrackets.Items.Add("Mat 1")
+        Call objMat1Manager.MarkBracketsReady()
 
-        Do Until objBracketManager.blnLastBracket
-            If objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
-                Call lstBrackets.Items.Add(objBracketManager.objGetCurrentBracket.DivisionName)
+        Do Until objMat1Manager.blnLastBracket
+            If objMat1Manager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
+                intPlayerCount = objMat1Manager.intGetPlayerCount
+                Call lstBrackets.Items.Add("  " & objMat1Manager.objGetCurrentBracket.DivisionName)
+                Call lstMat1.Items.Add(objMat1Manager.objGetCurrentBracket.DivisionName & ": " & _
+                                       intPlayerCount)
+                intTotalPlayerCount += intPlayerCount
             End If
-            Call objBracketManager.NextBracket()
+            Call objMat1Manager.NextBracket()
         Loop
+        lblMat1Count.Text = CStr(intTotalPlayerCount)
 
-    End Sub
+        intPlayerCount = 0
+        intTotalPlayerCount = 0
+        'Load Mat 2
+        Call lstBrackets.Items.Add("Mat 2")
 
-    Private Sub btnDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDelete.Click
-        Dim objAnswer As MsgBoxResult
+        Call objMat2Manager.MarkBracketsReady()
 
-        If Not IsNothing(lstBrackets.SelectedItem) Then
-            objAnswer = MsgBox("Delete selected bracket?", MsgBoxStyle.YesNo)
-
-            If objAnswer = MsgBoxResult.Yes Then
-                Call objBracketManager.DeleteBracket(CStr(lstBrackets.SelectedItem))
-                Call LoadBracketNames()
-                Call lstNames.Items.Clear()
+        Do Until objMat2Manager.blnLastBracket
+            If objMat2Manager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
+                intPlayerCount = objMat2Manager.intGetPlayerCount
+                Call lstBrackets.Items.Add("  " & objMat2Manager.objGetCurrentBracket.DivisionName)
+                Call lstMat2.Items.Add(objMat2Manager.objGetCurrentBracket.DivisionName & ": " & _
+                                       intPlayerCount)
+                intTotalPlayerCount += intPlayerCount
             End If
-        Else
-            MsgBox("Select a bracket to delete", MsgBoxStyle.OkOnly)
-        End If
+            Call objMat2Manager.NextBracket()
+        Loop
+        lblMat2Count.Text = CStr(intTotalPlayerCount)
     End Sub
 
-    Private Sub btnModify_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnModify.Click
-        Call ClearMatchNumbers()
-        Call ClearLoserBracketNames()
+    'Private Sub btnDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDeleteMat1.Click
+    'Dim objAnswer As MsgBoxResult
+
+    'If Not IsNothing(lstBrackets.SelectedItem) Then
+    '    objAnswer = MsgBox("Delete selected bracket?", MsgBoxStyle.YesNo)
+
+    '    If objAnswer = MsgBoxResult.Yes Then
+    '        Call objMat1Manager.DeleteBracket(CStr(lstBrackets.SelectedItem))
+    '        Call LoadBracketNames()
+    '        Call lstNames.Items.Clear()
+    '    End If
+    'Else
+    '    MsgBox("Select a bracket to delete", MsgBoxStyle.OkOnly)
+    'End If
+    'End Sub
+
+    Private Sub btnModify_Click(ByVal sender As System.Object, _
+                                ByVal e As System.EventArgs) _
+                                Handles btnModify.Click
+        Call ClearMatchNumbers(objMat1Manager)
+        Call ClearLoserBracketNames(objMat1Manager)
 
         btnDump.Enabled = True
         btnAddBracket.Enabled = True
         txtDivisionName.Enabled = True
         txtNames.Enabled = True
-        btnDelete.Enabled = True
+        btnDeleteMat1.Enabled = True
+        btnDeleteMat2.Enabled = True
+        btnUp.Enabled = True
+        btnDown.Enabled = True
         btnModify.Enabled = False
     End Sub
 
-    Private Sub ClearMatchNumbers()
+    Private Sub ClearMatchNumbers(ByRef r_objBracketManager As clsBracketManager)
         'Used when brackets needed to be reprocessed
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
 
-        Do Until objBracketManager.blnLastBracket
-            Do Until objBracketManager.blnLastMatch
-                objBracketManager.objGetCurrentMatch.matchNumber = 0
-                Call objBracketManager.NextMatch()
+        Do Until r_objBracketManager.blnLastBracket
+            Do Until r_objBracketManager.blnLastMatch
+                r_objBracketManager.objGetCurrentMatch.matchNumber = 0
+                Call r_objBracketManager.NextMatch()
             Loop
-            Call objBracketManager.NextBracket()
+            Call r_objBracketManager.NextBracket()
         Loop
 
     End Sub
 
-    Private Sub ClearLoserBracketNames()
-        Call objBracketManager.MarkBracketsReady()
+    Private Sub ClearLoserBracketNames(ByRef r_objBracketManager As clsBracketManager)
+        Call r_objBracketManager.MarkBracketsReady()
 
-        Do Until objBracketManager.blnLastBracket
-            If objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
-                Call objBracketManager.MarkBracketFinished()
+        Do Until r_objBracketManager.blnLastBracket
+            If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
+                Call r_objBracketManager.MarkBracketFinished()
             End If
-            Call objBracketManager.NextBracket()
+            Call r_objBracketManager.NextBracket()
         Loop
 
-        Call objBracketManager.FirstBracket()
+        Call r_objBracketManager.FirstBracket()
 
         'Loop through the Loser's brackets
-        Do Until objBracketManager.blnLastBracket
-            Do Until objBracketManager.blnLastMatch
-                objBracketManager.objGetCurrentMatch.player1 = String.Empty
-                If objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
-                    objBracketManager.objGetCurrentMatch.player2 = String.Empty
+        Do Until r_objBracketManager.blnLastBracket
+            Do Until r_objBracketManager.blnLastMatch
+                r_objBracketManager.objGetCurrentMatch.player1 = String.Empty
+                If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                    r_objBracketManager.objGetCurrentMatch.player2 = String.Empty
                 End If
-                Call objBracketManager.NextMatch()
+                Call r_objBracketManager.NextMatch()
             Loop
-            Call objBracketManager.MarkBracketFinished()
-            Call objBracketManager.NextBracket()
+            Call r_objBracketManager.MarkBracketFinished()
+            Call r_objBracketManager.NextBracket()
         Loop
-        Call objBracketManager.MarkBracketsReady()
+        Call r_objBracketManager.MarkBracketsReady()
 
+    End Sub
+
+    Private Sub btnDown_Click(ByVal sender As System.Object, _
+                              ByVal e As System.EventArgs) _
+                              Handles btnDown.Click
+        'Dim intTempIndex As Integer
+        '    intTempIndex = lstMat1.SelectedIndex
+        '    Call objMat1Manager.AssignBracketMat2(intTempIndex)
+        '    If CStr(lstMat1.Items(intTempIndex + 1)) = "Loser's Bracket" Then
+        '        Call lstMat2.Items.Add(lstMat1.SelectedItem)
+        '        Call lstMat2.Items.Add(lstMat1.Items(intTempIndex + 1))
+        '        Call lstMat1.Items.RemoveAt(intTempIndex)
+        '        Call lstMat1.Items.RemoveAt(intTempIndex)
+        '    Else
+        '        Call lstMat2.Items.Add(lstMat1.SelectedItem)
+        '        Call lstMat1.Items.RemoveAt(lstMat1.SelectedIndex)
+        '    End If
+        If Not IsNothing(lstMat1.SelectedItem) Then
+            If objMat1Manager.objGetBracket(lstMat1.SelectedIndex).BracketType = _
+               ce_BracketType.DoubleEWinner Then
+                Call objMat2Manager.AddBracket(objMat1Manager.objGetBracket(lstMat1.SelectedIndex))
+                Call objMat2Manager.AddBracket(objMat1Manager.objGetLosersBracket(lstMat1.SelectedIndex))
+                Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex, True)
+                'Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex)
+            Else
+                Call objMat2Manager.AddBracket(objMat1Manager.objGetBracket(lstMat1.SelectedIndex))
+                Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex)
+            End If
+
+            Call LoadBracketNames()
+        End If
+    End Sub
+
+    Private Sub btnUp_Click(ByVal sender As System.Object, _
+                            ByVal e As System.EventArgs) _
+                            Handles btnUp.Click
+        'Dim intTempIndex As Integer
+        'If Not IsNothing(lstMat2.SelectedItem) Then
+        '    intTempIndex = lstMat2.SelectedIndex
+        '    Call objMat1Manager.AssignBracketMat1(intTempIndex)
+        '    If CStr(lstMat2.Items(intTempIndex + 1)) = "Loser's Bracket" Then
+        '        Call lstMat1.Items.Add(lstMat2.SelectedItem)
+        '        Call lstMat1.Items.Add(lstMat2.Items(intTempIndex + 1))
+        '        Call lstMat2.Items.RemoveAt(intTempIndex)
+        '        Call lstMat2.Items.RemoveAt(intTempIndex)
+        '    Else
+        '        Call lstMat1.Items.Add(lstMat2.SelectedItem)
+        '        Call lstMat2.Items.RemoveAt(lstMat2.SelectedIndex)
+        '    End If
+
+        'End If
+        If Not IsNothing(lstMat2.SelectedItem) Then
+            If objMat2Manager.objGetBracket(lstMat2.SelectedIndex).BracketType = _
+               ce_BracketType.DoubleEWinner Then
+                Call objMat1Manager.AddBracket(objMat2Manager.objGetBracket(lstMat2.SelectedIndex))
+                Call objMat1Manager.AddBracket(objMat2Manager.objGetLosersBracket(lstMat2.SelectedIndex))
+                Call objMat2Manager.DeleteBracket(lstMat2.SelectedIndex, True)
+                'Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex)
+            Else
+                Call objMat1Manager.AddBracket(objMat2Manager.objGetBracket(lstMat2.SelectedIndex))
+                Call objMat2Manager.DeleteBracket(lstMat2.SelectedIndex)
+            End If
+
+            Call LoadBracketNames()
+        End If
+    End Sub
+
+    Private Sub btnDeleteMat1_Click(ByVal sender As System.Object, _
+                                    ByVal e As System.EventArgs) _
+                                    Handles btnDeleteMat1.Click
+        Dim objAnswer As MsgBoxResult
+        If Not IsNothing(lstMat1.SelectedItem) Then
+            objAnswer = MsgBox("Delete " & objMat1Manager.objGetBracket(lstMat1.SelectedIndex). _
+                                DivisionName & "?", MsgBoxStyle.Question)
+            If objAnswer = MsgBoxResult.Ok Then
+                If objMat1Manager.objGetBracket(lstMat1.SelectedIndex).BracketType = ce_BracketType.DoubleEWinner Then
+                    Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex, True)
+                Else
+                    Call objMat1Manager.DeleteBracket(lstMat1.SelectedIndex)
+                End If
+                Call LoadBracketNames()
+            End If
+        End If
+    End Sub
+
+    Private Sub btnDeleteMat2_Click(ByVal sender As System.Object, _
+                                    ByVal e As System.EventArgs) _
+                                    Handles btnDeleteMat2.Click
+        Dim objAnswer As MsgBoxResult
+        If Not IsNothing(lstMat2.SelectedItem) Then
+            objAnswer = MsgBox("Delete " & objMat2Manager.objGetBracket(lstMat2.SelectedIndex). _
+                               DivisionName & "?", MsgBoxStyle.Question)
+            If objAnswer = MsgBoxResult.Ok Then
+                If objMat2Manager.objGetBracket(lstMat2.SelectedIndex).BracketType = ce_BracketType.DoubleEWinner Then
+                    Call objMat2Manager.DeleteBracket(lstMat2.SelectedIndex, True)
+                Else
+                    Call objMat2Manager.DeleteBracket(lstMat2.SelectedIndex)
+                End If
+                Call LoadBracketNames()
+            End If
+        End If
     End Sub
 
 End Class
