@@ -1,3 +1,5 @@
+***SEE README.PDF FOR THE CURRENT (JAVA) VERSION!***
+
 Here are the basic instructions for running the program.
   Enter a division name in the top box
   Enter a list of names into the players' box (avoid any extra line breaks)
