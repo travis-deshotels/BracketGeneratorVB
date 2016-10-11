@@ -33,7 +33,8 @@ Public Class clsBracketManager
 
         'Add Bracket to list
         a_objBrackets.Add(objBracket)
-        intCurrentBracket += 1
+        'intCurrentBracket += 1
+        intCurrentBracket = a_objBrackets.Count - 1
 
         'Add a match counter for each bracket
         Call a_intMatchCount.Add(-1)
@@ -41,18 +42,37 @@ Public Class clsBracketManager
         objBracket = Nothing
     End Sub
 
-    'Public Sub AddBracket(ByVal v_objBracket As clsBracket)
-
-    '    'Add Bracket to list
-    '    a_objBrackets.Add(v_objBracket)
-    '    intCurrentBracket += 1
-
-    '    'Add a match counter for each bracket
-    '    Call a_intMatchCount.Add(-1)
-    'End Sub
-
     Public Sub DeleteBracket(ByVal v_strDivisionName As String)
+        '
+        'Deletes the bracket matching division name
+        'Resets the order of each bracket
+        'Sets current bracket to end of list
+        '
 
+        Call FirstBracket()
+        Do Until blnLastBracket()
+            If objGetCurrentBracket.DivisionName = v_strDivisionName Then
+                Exit Do
+            Else
+                Call NextBracket()
+            End If
+        Loop
+        If objGetCurrentBracket.BracketType = ce_BracketType.DoubleEWinner Then
+            Call a_objBrackets.RemoveAt(intCurrentBracket)
+            Call a_intMatchCount.RemoveAt(intCurrentBracket)
+            'Delete the Loser's bracket too
+            Call a_objBrackets.RemoveAt(intCurrentBracket)
+            Call a_intMatchCount.RemoveAt(intCurrentBracket)
+        Else
+            Call a_objBrackets.RemoveAt(intCurrentBracket)
+            Call a_intMatchCount.RemoveAt(intCurrentBracket)
+        End If
+
+        For intCount As Integer = 0 To a_objBrackets.Count - 1
+            CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
+        Next
+
+        intCurrentBracket = a_objBrackets.Count - 1
     End Sub
 
     Public Function blnBracketsFinished() As Boolean
@@ -141,7 +161,8 @@ Public Class clsBracketManager
         a_intMatchCount(intCurrentBracket) = CInt(a_intMatchCount(intCurrentBracket)) + 1
     End Sub
 
-    Public Sub FirstMatch()
+    Private Sub FirstMatch()
+        'method is private because all match pointers are reset at once
         a_intMatchCount(intCurrentBracket) = 0
     End Sub
 
