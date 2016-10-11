@@ -19,7 +19,6 @@ Public Class frmMain
         lstBracketType.Items.Add("2 out of 3")
         lstBracketType.Items.Add("True Double")
         lstBracketType.SelectedIndex = c_AutoIndex
-        Call radOldMethod.Select()
 
         'Call Test()
     End Sub
@@ -172,7 +171,7 @@ Public Class frmMain
         Next
 
         If ve_Type = ce_BracketType.DoubleEWinner Then
-            Call CreateLosersBracket(intPlayersEntered - 1)
+            Call CreateLosersBracket(intPlayersEntered)
         End If
 
         a_strNames = Nothing
@@ -219,6 +218,60 @@ Public Class frmMain
         txtNames.Text = String.Empty
         txtDivisionName.Text = String.Empty
     End Sub
+
+    'Call objMat1Manager.AddBracket(txtDivisionName.Text & " Loser's Bracket", ce_BracketType.DoubleELoser)
+    'Select Case v_intPlayerCount
+    '    Case 4
+    '        Call objMat1Manager.AddBracket(txtDivisionName.Text & " Loser's Bracket", ce_BracketType.DoubleELoser)
+    '        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '    Case 5, 6, 7, 8
+    '        If v_intPlayerCount = 5 OrElse v_intPlayerCount = 6 Then
+    '            Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        Else
+    '            Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        End If
+    '        '2nd match
+    '        If v_intPlayerCount = 8 Then
+    '            Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        Else
+    '            Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        End If
+
+    '        Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        '4th match
+    '        If v_intPlayerCount = 5 Then
+    '            Call objMat1Manager.AddMatch("bye", "bye")
+    '        Else
+    '            Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        End If
+
+    '        'Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        '6th-8th match
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+
+    '        '9th
+    '        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        '10th
+    '        If v_intPlayerCount = 5 Then
+    '            Call objMat1Manager.AddMatch(String.Empty, "bye")
+    '        Else
+    '            Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        End If
+    '        ''11th and 12th
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+    '        ''13th
+    '        Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '        ''14th
+    '        'Call objMat1Manager.AddMatch("bye", "bye")
+    '        '15th
+    '        'Call objMat1Manager.AddMatch(String.Empty, String.Empty)
+    '    Case Else
+    'End Select
 
     Private Sub CreateLosersBracket(ByVal v_intPlayerCount As Integer)
         Dim a_strNames(v_intPlayerCount - 1) As String
@@ -478,7 +531,7 @@ Public Class frmMain
 
     Private Sub NumberMatches(ByRef r_objBracketManager As clsBracketManager)
         Dim intMatchNum As Integer = 0
-        Dim intOneQuarter As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 4)
+        'Dim intOneQuarter As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 4)
 
         Call r_objBracketManager.MarkBracketsReady()
 
@@ -486,19 +539,19 @@ Public Class frmMain
             Call r_objBracketManager.FirstBracket()
             Do Until r_objBracketManager.blnLastBracket
                 'Skip numbering loser's brackets until 1/4 are done
-                If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
-                OrElse intMatchNum > intOneQuarter Then
-                    'Don't number matches that are byes
-                    If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
-                        intMatchNum += 1
-                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
-                    End If
-                    Call r_objBracketManager.NextMatch()
-                    If r_objBracketManager.blnLastMatch Then
-                        'Done numbering current bracket
-                        Call r_objBracketManager.MarkBracketFinished()
-                    End If
+                'If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then '_
+                'OrElse intMatchNum > intOneQuarter Then
+                'Don't number matches that are byes
+                If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                    intMatchNum += 1
+                    r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
                 End If
+                Call r_objBracketManager.NextMatch()
+                If r_objBracketManager.blnLastMatch Then
+                    'Done numbering current bracket
+                    Call r_objBracketManager.MarkBracketFinished()
+                End If
+                'End If
                 Call r_objBracketManager.NextBracket()
             Loop
         End While
@@ -508,59 +561,293 @@ Public Class frmMain
 
     Private Sub NumberMatches2(ByRef r_objBracketManager As clsBracketManager)
         Dim intMatchNum As Integer = 0
-        Dim intOneEightn As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 8)
-        Dim intHalfBracketMark As Integer
-        Dim intEndBracketMark As Integer
+        Dim lstIterators As New ArrayList
         Dim intCount As Integer
-        Dim intHalfCount As Integer
+        Dim bln1stRoundDone As Boolean = False
+        'Dim intOneQuarter As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 4)
 
-        intEndBracketMark = r_objBracketManager.intGetTotalBracketCount
-        intHalfBracketMark = CInt(intEndBracketMark / 2)
+        Call r_objBracketManager.FirstBracket()
+        Do Until r_objBracketManager.blnLastBracket
+            Call lstIterators.Add(New clsLevelIterator(r_objBracketManager.objGetCurrentBracket))
+            Call r_objBracketManager.NextBracket()
+        Loop
 
         Call r_objBracketManager.MarkBracketsReady()
 
-        'Number first half of the brackets
-        For intCount = 0 To intHalfBracketMark - 1
-            Call r_objBracketManager.NextBracket()
-        Next
+        While Not r_objBracketManager.blnBracketsFinished
+            Call r_objBracketManager.FirstBracket()
+            intCount = 0
 
-        For intCount = intHalfBracketMark To intEndBracketMark - 1
-            Call r_objBracketManager.MarkBracketFinished()
-            Call r_objBracketManager.NextBracket()
-        Next
+            Do Until r_objBracketManager.blnLastBracket
+                'Skip numbering loser's brackets until the 1st round of each other bracket is done
+                If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
+                OrElse bln1stRoundDone Then
+                    Select Case r_objBracketManager.objGetCurrentBracket.BracketType
+                        Case ce_BracketType.SingleE
+                            intMatchNum += 1
+                            r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                            Call r_objBracketManager.MarkBracketFinished()
+                            Call lstIterators.RemoveAt(intCount)
+                            intCount -= 1
+                        Case ce_BracketType.TwoOutOfThree, ce_BracketType.TrueDouble
+                            'Don't number matches that are byes
+                            If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                                intMatchNum += 1
+                                r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                            End If
+
+                            Call r_objBracketManager.NextMatch()
+                            If r_objBracketManager.blnLastMatch Then
+                                'Done numbering current bracket
+                                Call r_objBracketManager.MarkBracketFinished()
+                                Call lstIterators.RemoveAt(intCount)
+                                intCount -= 1
+                            End If
+                        Case Else
+                            'Number the whole round
+                            Call CType(lstIterators(intCount), clsLevelIterator).LevelStart()
+                            While True
+                                'Don't number matches that are byes
+                                If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                                    intMatchNum += 1
+                                    r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                                End If
+                                Call r_objBracketManager.NextMatch()
+                                If r_objBracketManager.blnLastMatch Then
+                                    'Done numbering current bracket
+                                    Call r_objBracketManager.MarkBracketFinished()
+                                    Call lstIterators.RemoveAt(intCount)
+                                    intCount -= 1
+                                    Exit While
+                                End If
+                                If CType(lstIterators(intCount), clsLevelIterator).blnLevelIsDone Then
+                                    Exit While
+                                End If
+                            End While
+                    End Select
+                End If
+                Call r_objBracketManager.NextBracket()
+                intCount += 1
+            Loop
+            bln1stRoundDone = True
+        End While
+
+        Call r_objBracketManager.MarkBracketsReady()
+    End Sub
+
+    Private Sub NumberMatches4(ByRef r_objBracketManager As clsBracketManager)
+        Dim intMatchNum As Integer = 0
+        Dim lstIterators As New ArrayList
+        Dim intCount As Integer
+        Dim objIterator As clsLevelIterator
+        'Dim bln1stRoundDone As Boolean = False
 
         Call r_objBracketManager.FirstBracket()
+        Do Until r_objBracketManager.blnLastBracket
+            objIterator = New clsLevelIterator(r_objBracketManager.objGetCurrentBracket)
+            Call objIterator.LevelStart()
+            Call lstIterators.Add(objIterator)
+            Call r_objBracketManager.NextBracket()
+        Loop
 
-        For intHalfCount = 0 To 1
-            While Not r_objBracketManager.blnBracketsFinished
-                Call r_objBracketManager.FirstBracket()
-                Do Until r_objBracketManager.blnLastBracket
-                    'Skip numbering loser's brackets until 1/4 are done
-                    If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
-                    OrElse intMatchNum > intOneEightn Then
+        Call r_objBracketManager.MarkBracketsReady()
+
+        'While Not r_objBracketManager.blnBracketsFinished
+        Call r_objBracketManager.FirstBracket()
+        intCount = 0
+
+        'Number the whole round
+
+        While True
+            'Don't number matches that are byes
+            If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                intMatchNum += 1
+                r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+            End If
+            Call r_objBracketManager.NextMatch()
+            If r_objBracketManager.blnLastMatch Then
+                'Done numbering current bracket
+                Call r_objBracketManager.MarkBracketFinished()
+                Call lstIterators.RemoveAt(intCount)
+                intCount -= 1
+                Exit While
+            End If
+            If CType(lstIterators(intCount), clsLevelIterator).blnLevelIsDone Then
+                Exit While
+            End If
+        End While
+        'End While
+    End Sub
+
+    Private Sub NumberMatches3(ByRef r_objBracketManager As clsBracketManager)
+        Dim intMatchNum As Integer = 0
+        Dim lstIterators As New ArrayList
+        Dim intCount As Integer
+        Dim objIterator As clsLevelIterator
+        'Dim bln1stRoundDone As Boolean = False
+
+        Call r_objBracketManager.FirstBracket()
+        Do Until r_objBracketManager.blnLastBracket
+            objIterator = New clsLevelIterator(r_objBracketManager.objGetCurrentBracket)
+            Call objIterator.LevelStart()
+            Call lstIterators.Add(objIterator)
+            Call r_objBracketManager.NextBracket()
+        Loop
+
+        Call r_objBracketManager.MarkBracketsReady()
+
+        'Phase 1
+        'Number the first two rounds of every double E bracket
+        'Number one match at a time for the other brackets
+
+        For intCounter As Integer = 1 To 2
+            Call r_objBracketManager.FirstBracket()
+            intCount = 0
+
+            Do Until r_objBracketManager.blnLastBracket
+                Select Case r_objBracketManager.objGetCurrentBracket.BracketType
+                    Case ce_BracketType.SingleE
+                        intMatchNum += 1
+                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                        Call r_objBracketManager.MarkBracketFinished()
+                        Call lstIterators.RemoveAt(intCount)
+                        intCount -= 1
+                    Case ce_BracketType.TwoOutOfThree, ce_BracketType.TrueDouble
                         'Don't number matches that are byes
                         If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
                             intMatchNum += 1
                             r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
                         End If
+
                         Call r_objBracketManager.NextMatch()
                         If r_objBracketManager.blnLastMatch Then
                             'Done numbering current bracket
                             Call r_objBracketManager.MarkBracketFinished()
+                            Call lstIterators.RemoveAt(intCount)
+                            intCount -= 1
                         End If
-                    End If
-                    Call r_objBracketManager.NextBracket()
-                Loop
-            End While
-
-            Call r_objBracketManager.MarkBracketsReady()
-
-            'Number second half of the brackets
-            For intCount = 0 To intHalfBracketMark - 1
-                Call r_objBracketManager.MarkBracketFinished()
+                    Case ce_BracketType.DoubleEWinner
+                        'Number the whole round
+                        'Call CType(lstIterators(intCount), clsLevelIterator).LevelStart()
+                        While True
+                            'Don't number matches that are byes
+                            If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                                intMatchNum += 1
+                                r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                            End If
+                            Call r_objBracketManager.NextMatch()
+                            If r_objBracketManager.blnLastMatch Then
+                                'Done numbering current bracket
+                                Call r_objBracketManager.MarkBracketFinished()
+                                Call lstIterators.RemoveAt(intCount)
+                                intCount -= 1
+                                Exit While
+                            End If
+                            If CType(lstIterators(intCount), clsLevelIterator).blnLevelIsDone Then
+                                Exit While
+                            End If
+                        End While
+                End Select
                 Call r_objBracketManager.NextBracket()
-            Next
-        Next intHalfCount
+                intCount += 1
+            Loop
+        Next
+
+        'Call r_objBracketManager.FirstBracket()
+        'Do Until r_objBracketManager.blnLastBracket
+        '    r_objBracketManager.objGetCurrentMatch.matchNumber = 99
+
+        '    Call r_objBracketManager.NextMatch()
+        '    If r_objBracketManager.blnLastMatch Then
+        '        r_objBracketManager.MarkBracketFinished()
+        '        Call r_objBracketManager.NextBracket()
+        '    End If
+        'Loop
+
+        'Phase 2
+        Call r_objBracketManager.FirstBracket()
+        intCount = 0
+
+        Do Until r_objBracketManager.blnLastBracket
+            If r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.DoubleEWinner AndAlso _
+               r_objBracketManager.blnDenseByeSpots Then
+                'Number the whole round
+
+                While True
+                    'Don't number matches that are byes
+                    If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                        intMatchNum += 1
+                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                    End If
+                    Call r_objBracketManager.NextMatch()
+                    If r_objBracketManager.blnLastMatch Then
+                        'Done numbering current bracket
+                        Call r_objBracketManager.MarkBracketFinished()
+                        Call lstIterators.RemoveAt(intCount)
+                        intCount -= 1
+                        Exit While
+                    End If
+                    If CType(lstIterators(intCount), clsLevelIterator).blnLevelIsDone Then
+                        Exit While
+                    End If
+                End While
+            End If
+
+            r_objBracketManager.NextBracket()
+            intCount += 1
+        Loop
+
+        'Phase 3
+
+        While Not r_objBracketManager.blnBracketsFinished
+            Call r_objBracketManager.FirstBracket()
+            intCount = 0
+
+            'Number a round of Loser's Brackets
+            Do Until r_objBracketManager.blnLastBracket
+                If r_objBracketManager.objGetCurrentBracket.BracketType = ce_BracketType.DoubleELoser Then
+                    'Don't number matches that are byes
+                    If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                        intMatchNum += 1
+                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                    End If
+
+                    Call r_objBracketManager.NextMatch()
+                    If r_objBracketManager.blnLastMatch Then
+                        'Done numbering current bracket
+                        Call r_objBracketManager.MarkBracketFinished()
+                        Call lstIterators.RemoveAt(intCount)
+                        intCount -= 1
+                    End If
+                End If
+                Call r_objBracketManager.NextBracket()
+                intCount += 1
+            Loop
+
+            Call r_objBracketManager.FirstBracket()
+            intCount = 0
+
+            'Number a round of Other Brackets
+            Do Until r_objBracketManager.blnLastBracket
+                If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
+                    'Don't number matches that are byes
+                    If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                        intMatchNum += 1
+                        r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                    End If
+
+                    Call r_objBracketManager.NextMatch()
+                    If r_objBracketManager.blnLastMatch Then
+                        'Done numbering current bracket
+                        Call r_objBracketManager.MarkBracketFinished()
+                        Call lstIterators.RemoveAt(intCount)
+                        intCount -= 1
+                    End If
+                End If
+                Call r_objBracketManager.NextBracket()
+                intCount += 1
+            Loop
+        End While
 
         Call r_objBracketManager.MarkBracketsReady()
     End Sub
@@ -655,22 +942,12 @@ Public Class frmMain
             btnDown.Enabled = False
 
             If objMat1Manager.intGetTotalMatchCount > 0 Then
-                If radOldMethod.Checked Then
-                    Call NumberMatches(objMat1Manager)
-                Else
-                    Call NumberMatches2(objMat1Manager)
-                End If
-
+                Call NumberMatches(objMat1Manager)
                 Call AddNamesToLosersBrackets(objMat1Manager)
             End If
 
             If objMat2Manager.intGetTotalMatchCount > 0 Then
-                If radOldMethod.Checked Then
-                    Call NumberMatches(objMat2Manager)
-                Else
-                    Call NumberMatches2(objMat2Manager)
-                End If
-
+                Call NumberMatches3(objMat2Manager)
                 Call AddNamesToLosersBrackets(objMat2Manager)
             End If
 
@@ -852,7 +1129,7 @@ Public Class frmMain
     Private Sub btnDown_Click(ByVal sender As System.Object, _
                               ByVal e As System.EventArgs) _
                               Handles btnDown.Click
- 
+
         If Not IsNothing(lstMat1.SelectedItem) Then
             If objMat1Manager.objGetBracket(lstMat1.SelectedIndex).BracketType = _
                ce_BracketType.DoubleEWinner Then

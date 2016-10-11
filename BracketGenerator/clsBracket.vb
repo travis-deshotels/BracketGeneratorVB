@@ -11,6 +11,12 @@ Public Class clsBracket
     Private e_Type As ce_BracketType
     Friend a_objMatches As ArrayList
     Private intBracketOrder As Integer
+    Private strExPlayer1 As String
+    Private strExPlayer2 As String
+    Private strExPlayer3 As String
+    Private intExMatch1 As Integer
+    Private intExMatch2 As Integer
+
     'Private intPlayerCount As Integer
 
     Public Sub New()
@@ -42,6 +48,51 @@ Public Class clsBracket
         End Get
         Set(ByVal value As Integer)
             intBracketOrder = value
+        End Set
+    End Property
+
+    Property ExPlayer1() As String
+        Get
+            Return strExPlayer1
+        End Get
+        Set(ByVal value As String)
+            strExPlayer1 = value
+        End Set
+    End Property
+
+    Property ExPlayer2() As String
+        Get
+            Return strExPlayer2
+        End Get
+        Set(ByVal value As String)
+            strExPlayer2 = value
+        End Set
+    End Property
+
+    Property ExPlayer3() As String
+        Get
+            Return strExPlayer3
+        End Get
+        Set(ByVal value As String)
+            strExPlayer3 = value
+        End Set
+    End Property
+
+    Property ExMatch1() As Integer
+        Get
+            Return intExMatch1
+        End Get
+        Set(ByVal value As Integer)
+            intExMatch1 = value
+        End Set
+    End Property
+
+    Property ExMatch2() As Integer
+        Get
+            Return intExMatch2
+        End Get
+        Set(ByVal value As Integer)
+            intExMatch2 = value
         End Set
     End Property
 

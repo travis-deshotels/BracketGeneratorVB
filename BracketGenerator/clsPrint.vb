@@ -86,23 +86,6 @@ Public Class clsPrint
         Call objFW.Close()
     End Sub
 
-    Private Sub PrintPageSeparator(ByVal v_strDivisionName As String)
-        objFW.Write("<table>")
-        objFW.Write("<tr><td>")
-        objFW.Write("<h1>&nbsp;</h1>")
-        objFW.Write("</td></tr>")
-        objFW.Write("<tr><td>")
-        objFW.Write("<h1>&nbsp;</h1>")
-        objFW.Write("</td></tr>")
-        objFW.Write("<tr><td>")
-        objFW.Write("<h1 align=center>")
-        objFW.Write(v_strDivisionName)
-        objFW.Write("</h1>")
-        objFW.Write("</td></tr>")
-        objFW.Write("</table>")
-        objFW.Write("<div class=""page-break""></div>")
-    End Sub
-
     Public Sub PrintMatchCards()
         Dim lstBrackets As New ArrayList
         Call lstBrackets.Add(objMat1Manager)
@@ -118,11 +101,6 @@ Public Class clsPrint
 
             Call objBracketManager.FirstBracket()
             Do Until objBracketManager.blnLastBracket
-                'Add divider
-                If objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser Then
-                    Call PrintPageSeparator(objBracketManager.objGetCurrentBracket.DivisionName)
-                End If
-
                 Select Case objBracketManager.objGetCurrentBracket.BracketType
                     Case ce_BracketType.DoubleEWinner
                         Call objBracketManager.LevelStart()

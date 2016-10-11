@@ -320,8 +320,24 @@ Public Class clsBracketManager
         Return objGetCurrentBracket.a_objMatches.Count + 1
     End Function
 
-    Public Function intGetTotalBracketCount() As Integer
-        Return a_objBrackets.Count
+    Public Function blnDenseByeSpots() As Boolean
+        Dim objCurrentBracket As clsBracket = CType(a_objBrackets(intCurrentBracket), clsBracket)
+        Dim intBracketSize As Integer = objCurrentBracket.a_objMatches.Count + 1
+        Dim intFirstRound As Integer = CInt(intBracketSize / 2)
+        Dim intByeCount As Integer = 0
+
+        For intCount As Integer = 0 To intFirstRound - 1
+            If CType(objCurrentBracket.a_objMatches(intCount), clsMatch).player2 = "bye" Then
+                intByeCount += 1
+            End If
+        Next
+
+        If intFirstRound / intByeCount <= 2 Then
+            Return True
+        Else
+            Return False
+        End If
+
     End Function
 
     Public Sub TestSort()
@@ -365,47 +381,6 @@ Public Class clsBracketManager
 
         Call SortFinishedBrackets()
     End Sub
-
-    'Public Sub AssignBracketMat2(ByVal v_intBracketOrder As Integer)
-    '    If CType(a_objBrackets(v_intBracketOrder), clsBracket).BracketType = ce_BracketType.DoubleEWinner Then
-    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder))
-    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder + 1))
-    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
-    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
-    '    Else
-    '        Call a_objMat2Brackets.Add(a_objBrackets(v_intBracketOrder))
-    '        Call a_objBrackets.RemoveAt(v_intBracketOrder)
-    '    End If
-
-    '    For intCount As Integer = 0 To a_objBrackets.Count - 1
-    '        CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
-    '    Next
-
-    '    For intCount As Integer = 0 To a_objMat2Brackets.Count - 1
-    '        CType(a_objMat2Brackets(intCount), clsBracket).BracketOrder = intCount
-    '    Next
-    'End Sub
-
-    'Public Sub AssignBracketMat1(ByVal v_intBracketOrder As Integer)
-    '    If CType(a_objMat2Brackets(v_intBracketOrder), clsBracket).BracketType = ce_BracketType.DoubleEWinner Then
-    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder))
-    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder + 1))
-    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
-    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
-    '    Else
-    '        Call a_objBrackets.Add(a_objMat2Brackets(v_intBracketOrder))
-    '        Call a_objMat2Brackets.RemoveAt(v_intBracketOrder)
-    '    End If
-
-    '    For intCount As Integer = 0 To a_objBrackets.Count - 1
-    '        CType(a_objBrackets(intCount), clsBracket).BracketOrder = intCount
-    '    Next
-
-    '    For intCount As Integer = 0 To a_objMat2Brackets.Count - 1
-    '        CType(a_objMat2Brackets(intCount), clsBracket).BracketOrder = intCount
-    '    Next
-    'End Sub
-
 
     '
     '  Used for processing brackets by level
