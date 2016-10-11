@@ -19,6 +19,7 @@ Public Class frmMain
         lstBracketType.Items.Add("2 out of 3")
         lstBracketType.Items.Add("True Double")
         lstBracketType.SelectedIndex = c_AutoIndex
+        Call radOldMethod.Select()
 
         'Call Test()
     End Sub
@@ -505,6 +506,65 @@ Public Class frmMain
         Call r_objBracketManager.MarkBracketsReady()
     End Sub
 
+    Private Sub NumberMatches2(ByRef r_objBracketManager As clsBracketManager)
+        Dim intMatchNum As Integer = 0
+        Dim intOneEightn As Integer = CInt(r_objBracketManager.intGetTotalMatchCount / 8)
+        Dim intHalfBracketMark As Integer
+        Dim intEndBracketMark As Integer
+        Dim intCount As Integer
+        Dim intHalfCount As Integer
+
+        intEndBracketMark = r_objBracketManager.intGetTotalBracketCount
+        intHalfBracketMark = CInt(intEndBracketMark / 2)
+
+        Call r_objBracketManager.MarkBracketsReady()
+
+        'Number first half of the brackets
+        For intCount = 0 To intHalfBracketMark - 1
+            Call r_objBracketManager.NextBracket()
+        Next
+
+        For intCount = intHalfBracketMark To intEndBracketMark - 1
+            Call r_objBracketManager.MarkBracketFinished()
+            Call r_objBracketManager.NextBracket()
+        Next
+
+        Call r_objBracketManager.FirstBracket()
+
+        For intHalfCount = 0 To 1
+            While Not r_objBracketManager.blnBracketsFinished
+                Call r_objBracketManager.FirstBracket()
+                Do Until r_objBracketManager.blnLastBracket
+                    'Skip numbering loser's brackets until 1/4 are done
+                    If r_objBracketManager.objGetCurrentBracket.BracketType <> ce_BracketType.DoubleELoser _
+                    OrElse intMatchNum > intOneEightn Then
+                        'Don't number matches that are byes
+                        If r_objBracketManager.objGetCurrentMatch.player2 <> "bye" Then
+                            intMatchNum += 1
+                            r_objBracketManager.objGetCurrentMatch.matchNumber = intMatchNum
+                        End If
+                        Call r_objBracketManager.NextMatch()
+                        If r_objBracketManager.blnLastMatch Then
+                            'Done numbering current bracket
+                            Call r_objBracketManager.MarkBracketFinished()
+                        End If
+                    End If
+                    Call r_objBracketManager.NextBracket()
+                Loop
+            End While
+
+            Call r_objBracketManager.MarkBracketsReady()
+
+            'Number second half of the brackets
+            For intCount = 0 To intHalfBracketMark - 1
+                Call r_objBracketManager.MarkBracketFinished()
+                Call r_objBracketManager.NextBracket()
+            Next
+        Next intHalfCount
+
+        Call r_objBracketManager.MarkBracketsReady()
+    End Sub
+
     Private Sub AddNamesToLosersBrackets(ByRef r_objBracketManager As clsBracketManager)
         Dim intMatchNumber As Integer
         Dim blnDone As Boolean = False
@@ -595,12 +655,22 @@ Public Class frmMain
             btnDown.Enabled = False
 
             If objMat1Manager.intGetTotalMatchCount > 0 Then
-                Call NumberMatches(objMat1Manager)
+                If radOldMethod.Checked Then
+                    Call NumberMatches(objMat1Manager)
+                Else
+                    Call NumberMatches2(objMat1Manager)
+                End If
+
                 Call AddNamesToLosersBrackets(objMat1Manager)
             End If
 
             If objMat2Manager.intGetTotalMatchCount > 0 Then
-                Call NumberMatches(objMat2Manager)
+                If radOldMethod.Checked Then
+                    Call NumberMatches(objMat2Manager)
+                Else
+                    Call NumberMatches2(objMat2Manager)
+                End If
+
                 Call AddNamesToLosersBrackets(objMat2Manager)
             End If
 

@@ -320,6 +320,10 @@ Public Class clsBracketManager
         Return objGetCurrentBracket.a_objMatches.Count + 1
     End Function
 
+    Public Function intGetTotalBracketCount() As Integer
+        Return a_objBrackets.Count
+    End Function
+
     Public Sub TestSort()
         Dim b As clsBracket
 
