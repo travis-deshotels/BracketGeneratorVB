@@ -50,18 +50,15 @@ Partial Class frmMain
         Me.btnDown = New System.Windows.Forms.Button
         Me.btnUp = New System.Windows.Forms.Button
         Me.grpmat1 = New System.Windows.Forms.GroupBox
-        Me.lblMat1Count = New System.Windows.Forms.Label
         Me.lstMat1 = New System.Windows.Forms.ListBox
         Me.lblMat1 = New System.Windows.Forms.Label
         Me.grpmat2 = New System.Windows.Forms.GroupBox
-        Me.lblMat2Count = New System.Windows.Forms.Label
         Me.btnDeleteMat2 = New System.Windows.Forms.Button
         Me.lblMat2 = New System.Windows.Forms.Label
         Me.lstMat2 = New System.Windows.Forms.ListBox
         Me.btnModify = New System.Windows.Forms.Button
-        Me.grpNumbering = New System.Windows.Forms.GroupBox
-        Me.radOldMethod = New System.Windows.Forms.RadioButton
-        Me.radNewMethod = New System.Windows.Forms.RadioButton
+        Me.lblMat1Count = New System.Windows.Forms.Label
+        Me.lblMat2Count = New System.Windows.Forms.Label
         Me.pagDelete.SuspendLayout()
         Me.grpDelMain.SuspendLayout()
         Me.grpDelPlayers.SuspendLayout()
@@ -76,7 +73,6 @@ Partial Class frmMain
         Me.grpMatsMain.SuspendLayout()
         Me.grpmat1.SuspendLayout()
         Me.grpmat2.SuspendLayout()
-        Me.grpNumbering.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnDump
@@ -352,15 +348,6 @@ Partial Class frmMain
         Me.grpmat1.TabIndex = 4
         Me.grpmat1.TabStop = False
         '
-        'lblMat1Count
-        '
-        Me.lblMat1Count.AutoSize = True
-        Me.lblMat1Count.Location = New System.Drawing.Point(403, 136)
-        Me.lblMat1Count.Name = "lblMat1Count"
-        Me.lblMat1Count.Size = New System.Drawing.Size(13, 13)
-        Me.lblMat1Count.TabIndex = 101
-        Me.lblMat1Count.Text = "0"
-        '
         'lstMat1
         '
         Me.lstMat1.FormattingEnabled = True
@@ -389,15 +376,6 @@ Partial Class frmMain
         Me.grpmat2.Size = New System.Drawing.Size(470, 160)
         Me.grpmat2.TabIndex = 5
         Me.grpmat2.TabStop = False
-        '
-        'lblMat2Count
-        '
-        Me.lblMat2Count.AutoSize = True
-        Me.lblMat2Count.Location = New System.Drawing.Point(406, 146)
-        Me.lblMat2Count.Name = "lblMat2Count"
-        Me.lblMat2Count.Size = New System.Drawing.Size(13, 13)
-        Me.lblMat2Count.TabIndex = 5
-        Me.lblMat2Count.Text = "0"
         '
         'btnDeleteMat2
         '
@@ -435,44 +413,29 @@ Partial Class frmMain
         Me.btnModify.Text = "Modify"
         Me.btnModify.UseVisualStyleBackColor = True
         '
-        'grpNumbering
+        'lblMat1Count
         '
-        Me.grpNumbering.Controls.Add(Me.radNewMethod)
-        Me.grpNumbering.Controls.Add(Me.radOldMethod)
-        Me.grpNumbering.Location = New System.Drawing.Point(5, 378)
-        Me.grpNumbering.Name = "grpNumbering"
-        Me.grpNumbering.Size = New System.Drawing.Size(271, 32)
-        Me.grpNumbering.TabIndex = 101
-        Me.grpNumbering.TabStop = False
+        Me.lblMat1Count.AutoSize = True
+        Me.lblMat1Count.Location = New System.Drawing.Point(403, 136)
+        Me.lblMat1Count.Name = "lblMat1Count"
+        Me.lblMat1Count.Size = New System.Drawing.Size(13, 13)
+        Me.lblMat1Count.TabIndex = 101
+        Me.lblMat1Count.Text = "0"
         '
-        'radOldMethod
+        'lblMat2Count
         '
-        Me.radOldMethod.AutoSize = True
-        Me.radOldMethod.Location = New System.Drawing.Point(8, 9)
-        Me.radOldMethod.Name = "radOldMethod"
-        Me.radOldMethod.Size = New System.Drawing.Size(76, 17)
-        Me.radOldMethod.TabIndex = 0
-        Me.radOldMethod.TabStop = True
-        Me.radOldMethod.Text = "Number All"
-        Me.radOldMethod.UseVisualStyleBackColor = True
-        '
-        'radNewMethod
-        '
-        Me.radNewMethod.AutoSize = True
-        Me.radNewMethod.Location = New System.Drawing.Point(95, 9)
-        Me.radNewMethod.Name = "radNewMethod"
-        Me.radNewMethod.Size = New System.Drawing.Size(84, 17)
-        Me.radNewMethod.TabIndex = 1
-        Me.radNewMethod.TabStop = True
-        Me.radNewMethod.Text = "Number Half"
-        Me.radNewMethod.UseVisualStyleBackColor = True
+        Me.lblMat2Count.AutoSize = True
+        Me.lblMat2Count.Location = New System.Drawing.Point(406, 146)
+        Me.lblMat2Count.Name = "lblMat2Count"
+        Me.lblMat2Count.Size = New System.Drawing.Size(13, 13)
+        Me.lblMat2Count.TabIndex = 5
+        Me.lblMat2Count.Text = "0"
         '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(593, 415)
-        Me.Controls.Add(Me.grpNumbering)
         Me.Controls.Add(Me.btnModify)
         Me.Controls.Add(Me.btnDump)
         Me.Controls.Add(Me.tabMain)
@@ -503,8 +466,6 @@ Partial Class frmMain
         Me.grpmat1.PerformLayout()
         Me.grpmat2.ResumeLayout(False)
         Me.grpmat2.PerformLayout()
-        Me.grpNumbering.ResumeLayout(False)
-        Me.grpNumbering.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -545,8 +506,5 @@ Partial Class frmMain
     Friend WithEvents btnDeleteMat2 As System.Windows.Forms.Button
     Friend WithEvents lblMat1Count As System.Windows.Forms.Label
     Friend WithEvents lblMat2Count As System.Windows.Forms.Label
-    Friend WithEvents grpNumbering As System.Windows.Forms.GroupBox
-    Friend WithEvents radNewMethod As System.Windows.Forms.RadioButton
-    Friend WithEvents radOldMethod As System.Windows.Forms.RadioButton
 
 End Class
